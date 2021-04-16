@@ -1,0 +1,7 @@
+- The body of the snake (minus the head) should be counted as "walls." Whatever system holds the info for the snake's
+  body needs to compute the grid location for each body piece (each square) and send this info to the search
+  algorithms.
+
+- The only new walls that will appear when the snake moves to get the next food will be directly behind him - should
+  we only feed the snake the wall locations once per new food appearance? Do we need to update as we go since some walls
+  will disappear? (the tail end of the snake will move walls, a new path could theoretically appear as the snake moves)
