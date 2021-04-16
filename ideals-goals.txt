@@ -5,3 +5,6 @@
 - The only new walls that will appear when the snake moves to get the next food will be directly behind him - should
   we only feed the snake the wall locations once per new food appearance? Do we need to update as we go since some walls
   will disappear? (the tail end of the snake will move walls, a new path could theoretically appear as the snake moves)
+
+- Algorithm can choose north, south, east or west. Depending on what is returned these can be related to a key press
+  action in the game so that all the methods of snake still work correctly.
