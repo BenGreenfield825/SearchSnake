@@ -128,6 +128,29 @@ class snake(object):
             else:
                 c.draw(surface)
 
+    def getSuccessors(self, current_pos):    # more like surrounding grid positions
+        """returns a tuple of states, actions, costs"""
+        # possible successor cannot be our body, must ignore position which is not body part
+        successors = [] # tuple of states, actions, cost (grid pos, direction to get there, cost to get there)
+
+        """code to model after from pacman project"""
+        # for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+        #     x, y = state
+        #     dx, dy = Actions.directionToVector(action)
+        #     nextx, nexty = int(x + dx), int(y + dy)
+        #     if not self.walls[nextx][nexty]:
+        #         nextState = (nextx, nexty)
+        #         cost = self.costFn(nextState)
+        #         successors.append((nextState, action, cost))
+        #
+        # # Bookkeeping for display purposes
+        # self._expanded += 1  # DO NOT CHANGE
+        # if state not in self._visited:
+        #     self._visited[state] = True
+        #     self._visitedlist.append(state)
+
+        return successors
+
 
 def drawGrid(w, rows, surface):
     sizeBtwn = w // rows
