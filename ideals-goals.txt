@@ -8,3 +8,5 @@
 
 - Algorithm can choose north, south, east or west. Depending on what is returned these can be related to a key press
   action in the game so that all the methods of snake still work correctly.
+
+- Functions we need: getSuccessor, getActions, getIsGoalState, getStartState, getCostOfActions
