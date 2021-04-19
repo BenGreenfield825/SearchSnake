@@ -1,4 +1,3 @@
-# Snake Tutorial Python
 
 """ snake.py will be source of the actual game """
 
@@ -58,6 +57,7 @@ class snake(object):
             keys = pygame.key.get_pressed()
 
             for key in keys:
+                print("Head position:", self.head.pos) # lets us see grid pos for head
                 if keys[pygame.K_LEFT]:
                     self.dirnx = -1
                     self.dirny = 0
