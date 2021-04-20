@@ -133,6 +133,7 @@ class snake(object):
         # possible successor cannot be our body, must ignore position which is not body part
         successors = [] # tuple of states, actions, cost (grid pos, direction to get there, cost to get there)
 
+        """can we just take the dirnx, dirny and subtract 1 from each? use pos instead?"""
         """code to model after from pacman project"""
         # for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
         #     x, y = state
