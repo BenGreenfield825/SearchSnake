@@ -50,6 +50,7 @@ class snake(object):
         self.dirny = 1
 
         self.walls = []
+        self.walls.append(self.head)
 
     def move(self):
         for event in pygame.event.get():
@@ -139,27 +140,44 @@ class snake(object):
 
     def getSuccessors(self, current_pos):    # more like surrounding grid positions
         """returns a tuple of states, actions, costs"""
-        # possible successor cannot be our body, includes our "neck" and also body parts that are tailing around
-        successors = [] # tuple of states, actions, cost (grid pos, direction to get there, cost to get there)
 
-        """can we just take the dirnx, dirny and subtract 1 from each? use pos instead?"""
-        """code to model after from pacman project"""
-        # for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
-        #     x, y = state
-        #     dx, dy = Actions.directionToVector(action)
-        #     nextx, nexty = int(x + dx), int(y + dy)
-        #     if not self.walls[nextx][nexty]:
-        #         nextState = (nextx, nexty)
-        #         cost = self.costFn(nextState)
-        #         successors.append((nextState, action, cost))
-        #
-        # # Bookkeeping for display purposes
-        # self._expanded += 1  # DO NOT CHANGE
-        # if state not in self._visited:
-        #     self._visited[state] = True
-        #     self._visitedlist.append(state)
+        '''Theoretically the max # of successors that can be generated at once should be 3: in front of the head,
+         and the two sides of the head. We will also make it so that the snake can not wrap around the screen.'''
+        # todo: make what I just said true lmao ^
 
-        print(current_pos)
+        # todo: Currently body right behind the head is being added to successors (I assume other walls will be too).
+        successors = []  # tuple of states, actions, cost (grid pos, direction to get there, cost to get there)
+        x, y = current_pos
+        possible_moves = [-1, 0, 1] # x or y can either stay, increase or decrease position by 1
+        # either x or y can move, but not both at a time
+        print("Current pos:", current_pos)
+        for moves in possible_moves:
+            nextX = x + moves   # x will move, y will stay the same
+            nextY = y
+            if nextX < 0 or nextX > 19: # make sure we don't go out of bounds
+                continue
+            nextState = nextX, nextY
+            for index, wallX in enumerate(self.walls):
+                # print("wall.pos:", wall.pos)
+                # print("next:", nextState)
+                if wallX.pos != nextState:   # if nextState we generated is not a wall
+                    if nextState != current_pos:
+                        if nextState not in successors:
+                            successors.append(nextState)
+
+        for moves in possible_moves:
+            nextX = x
+            nextY = y + moves # y will move, x will stay the same
+            if nextY < 0 or nextY > 19: # make sure we don't go out of bounds
+                continue
+            nextState = nextX, nextY
+            for index, wallY in enumerate(self.walls):
+                if wallY.pos != nextState:   # if nextState we generated is not a wall
+                    if nextState != current_pos:
+                        if nextState not in successors:
+                            successors.append(nextState)
+
+        print("Successors:", successors)
         return successors
 
 
@@ -222,8 +240,8 @@ def main():
     clock = pygame.time.Clock()
 
     while flag:
-        for index, position in enumerate(s.walls):  # we can use this to see current walls (basically our body)
-            print("Walls:", position.pos)
+        # for index, position in enumerate(s.walls):  # we can use this to see current walls (basically our body)
+        #     print("Walls:", position.pos)
         pygame.time.delay(50)
         clock.tick(10)
         s.move()
@@ -243,7 +261,7 @@ def main():
         # test line
         s.getSuccessors(s.head.pos) # the head's position works as our current position
 
-    pass
+
 
 
 # main()
