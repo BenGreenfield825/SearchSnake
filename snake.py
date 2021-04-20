@@ -49,6 +49,8 @@ class snake(object):
         self.dirnx = 0
         self.dirny = 1
 
+        self.walls = []
+
     def move(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -57,7 +59,7 @@ class snake(object):
             keys = pygame.key.get_pressed()
 
             for key in keys:
-                print("Head position:", self.head.pos) # lets us see grid pos for head
+                # print("Head position:", self.head.pos) # lets us see grid pos for head
                 if keys[pygame.K_LEFT]:
                     self.dirnx = -1
                     self.dirny = 0
@@ -111,12 +113,19 @@ class snake(object):
 
         if dx == 1 and dy == 0:
             self.body.append(cube((tail.pos[0] - 1, tail.pos[1])))
+            self.walls = self.body
         elif dx == -1 and dy == 0:
             self.body.append(cube((tail.pos[0] + 1, tail.pos[1])))
+            self.walls = self.body
         elif dx == 0 and dy == 1:
             self.body.append(cube((tail.pos[0], tail.pos[1] - 1)))
+            self.walls = self.body
         elif dx == 0 and dy == -1:
             self.body.append(cube((tail.pos[0], tail.pos[1] + 1)))
+            self.walls = self.body
+
+        # for index, position in enumerate(self.walls):
+        #     print("Walls:", position.pos)
 
         self.body[-1].dirnx = dx
         self.body[-1].dirny = dy
@@ -130,7 +139,7 @@ class snake(object):
 
     def getSuccessors(self, current_pos):    # more like surrounding grid positions
         """returns a tuple of states, actions, costs"""
-        # possible successor cannot be our body, must ignore position which is not body part
+        # possible successor cannot be our body, includes our "neck" and also body parts that are tailing around
         successors = [] # tuple of states, actions, cost (grid pos, direction to get there, cost to get there)
 
         """can we just take the dirnx, dirny and subtract 1 from each? use pos instead?"""
@@ -150,6 +159,7 @@ class snake(object):
         #     self._visited[state] = True
         #     self._visitedlist.append(state)
 
+        print(current_pos)
         return successors
 
 
@@ -212,6 +222,8 @@ def main():
     clock = pygame.time.Clock()
 
     while flag:
+        for index, position in enumerate(s.walls):  # we can use this to see current walls (basically our body)
+            print("Walls:", position.pos)
         pygame.time.delay(50)
         clock.tick(10)
         s.move()
@@ -227,6 +239,9 @@ def main():
                 break
 
         redrawWindow(win)
+
+        # test line
+        s.getSuccessors(s.head.pos) # the head's position works as our current position
 
     pass
 
