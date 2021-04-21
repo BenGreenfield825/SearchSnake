@@ -158,15 +158,21 @@ class snake(object):
         # todo: Currently body right behind the head is being added to successors (I assume other walls will be too).
         successors = []  # tuple of states, actions, cost (grid pos, direction to get there, cost to get there)
         x, y = current_pos
-        possible_moves = [-1, 0, 1] # x or y can either stay, increase or decrease position by 1
+        possible_moves = [-1, 1] # x or y can either stay, increase or decrease position by 1
         # either x or y can move, but not both at a time
         # print("Current pos:", current_pos)
-        for moves in possible_moves:
-            nextX = x + moves   # x will move, y will stay the same
+        for movesX in possible_moves:
+            nextX = x + movesX   # x will move, y will stay the same
             nextY = y
             if nextX < 0 or nextX > 19: # make sure we don't go out of bounds
                 continue
             nextState = nextX, nextY
+            print("Current pos2:", current_pos, "next:", nextState)
+            for fuck, noU in enumerate(self.walls):
+                print("walls:", noU.pos)
+            if nextState in self.walls:
+                print("FFFFFFFFFFFFFFFFF")
+                break
             for index, wallX in enumerate(self.walls):
                 # print("wall.pos:", wall.pos)
                 # print("next:", nextState)
@@ -181,13 +187,18 @@ class snake(object):
             if nextY < 0 or nextY > 19: # make sure we don't go out of bounds
                 continue
             nextState = nextX, nextY
+            if nextState in self.walls:
+                print("FFFFFFFFFFFFFFFFF")
+                break
             for index, wallY in enumerate(self.walls):
+                # print("wally:", wallY.pos)
+                # print("next:", nextState)
                 if wallY.pos != nextState:   # if nextState we generated is not a wall
                     if nextState != current_pos:
                         if nextState not in successors:
                             successors.append(nextState)
 
-        # print("Successors:", successors)
+        print("Successors:", successors)
         return successors
 
 
