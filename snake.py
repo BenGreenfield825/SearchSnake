@@ -138,19 +138,29 @@ class snake(object):
             else:
                 c.draw(surface)
 
+    def isGoalState(self, current_pos):
+        # todo: Current pos is being looked at after the food has already been eaten, so the food is in a different spot, hence if statement is never true
+        # print("current:", current_pos)
+        # print("food:", food.pos)
+        if current_pos == food.pos:
+            print("Goal state!")
+            return True
+        else:
+            return False
+
     def getSuccessors(self, current_pos):    # more like surrounding grid positions
         """returns a tuple of states, actions, costs"""
 
         '''Theoretically the max # of successors that can be generated at once should be 3: in front of the head,
-         and the two sides of the head. We will also make it so that the snake can not wrap around the screen.'''
-        # todo: make what I just said true lmao ^
+        and the two sides of the head (if we have not eaten food yet we can have 4 successors). We will also make it so
+        that the snake can not wrap around the screen.'''
 
         # todo: Currently body right behind the head is being added to successors (I assume other walls will be too).
         successors = []  # tuple of states, actions, cost (grid pos, direction to get there, cost to get there)
         x, y = current_pos
         possible_moves = [-1, 0, 1] # x or y can either stay, increase or decrease position by 1
         # either x or y can move, but not both at a time
-        print("Current pos:", current_pos)
+        # print("Current pos:", current_pos)
         for moves in possible_moves:
             nextX = x + moves   # x will move, y will stay the same
             nextY = y
@@ -177,7 +187,7 @@ class snake(object):
                         if nextState not in successors:
                             successors.append(nextState)
 
-        print("Successors:", successors)
+        # print("Successors:", successors)
         return successors
 
 
@@ -201,6 +211,7 @@ def redrawWindow(surface):
     snack.draw(surface)
     drawGrid(width, rows, surface)
     pygame.display.update()
+    # print("yum:", food.pos)
 
 
 def randomSnack(rows, item):
@@ -228,6 +239,14 @@ def message_box(subject, content):
         pass
 
 
+def getSnack(yumyum):
+    pass
+
+
+# global food
+food = []
+
+
 def main():
     global width, rows, s, snack
     width = 500
@@ -235,6 +254,8 @@ def main():
     win = pygame.display.set_mode((width, width))
     s = snake((255, 0, 0), (10, 10))
     snack = cube(randomSnack(rows, s), color=(0, 255, 0))
+    global food
+    food = snack
     flag = True
 
     clock = pygame.time.Clock()
@@ -248,6 +269,7 @@ def main():
         if s.body[0].pos == snack.pos:
             s.addCube()
             snack = cube(randomSnack(rows, s), color=(0, 255, 0))
+            food = snack
 
         for x in range(len(s.body)):
             if s.body[x].pos in list(map(lambda z: z.pos, s.body[x + 1:])):
@@ -260,6 +282,7 @@ def main():
 
         # test line
         s.getSuccessors(s.head.pos) # the head's position works as our current position
+        s.isGoalState(s.head.pos)
 
 
 
