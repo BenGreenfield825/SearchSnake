@@ -1,22 +1,27 @@
-import snake
 
+# CSCI 4478 - Dr Vahid Behzadan
+# Name: searchAgents.py
+# Description: Agents to test and figure out a snake's search AI
+# Code design mirrors that of Pacman code in http://ai.berkeley.edu
+# Revision: 4/22/2021
 
-def main():
-    # main can call the different search functions (ideally we should set up command line args but idk how to do that so)
-    # depthFirstSearch()
-    snake.main()
-    return
+from game import Directions
+from game import Agent
+from game import Actions
+import util
+import time
+import search
 
+import math
 
-def depthFirstSearch():
-    print("Starting depth first search algorithm...")
-    return
+# 3. todo: go west needs to work with snake
+class GoWestAgent(Agent):
+    "An agent that goes West until it can't."
 
-
-def breadthFirstSearch():
-    print("Starting breadth first search algorithm...")
-    return
-
-
-# ideally the only line of code outside of a function should just be a call to main so we can focus on just the functions
-main()
+    def getAction(self, state):
+        "The agent receives a GameState (defined in pacman.py)."
+        # 2. todo: look into STATE and getLegalSnakeActions
+        if Directions.WEST in state.getLegalPacmanActions():
+            return Directions.WEST
+        else:
+            return Directions.STOP

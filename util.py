@@ -1,15 +1,9 @@
-# util.py
-# -------
-# Licensing Information:  You are free to use or extend these projects for
-# educational purposes provided that (1) you do not distribute or publish
-# solutions, (2) you retain this notice, and (3) you provide clear
-# attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
-# Attribution Information: The Pacman AI projects were developed at UC Berkeley.
-# The core projects and autograders were primarily created by John DeNero
-# (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
-# Student side autograding was added by Brad Miller, Nick Hay, and
-# Pieter Abbeel (pabbeel@cs.berkeley.edu).
+
+# CSCI 4478 - Dr Vahid Behzadan
+# Name: util.py
+# Description: Useful utilities for our Snake AI
+# All credit for code goes to http://ai.berkeley.edu
+# Revision: 4/22/2021
 
 
 # util.py
@@ -140,3 +134,9 @@ def euclideanDistance(xy1, xy2):
     "The Euclidean distance heuristic for a PositionSearchProblem"
     return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
 
+def notDefined():
+    fileName = inspect.stack()[1][1]
+    line = inspect.stack()[1][2]
+    method = inspect.stack()[1][3]
+    print("*** Method not implemented: %s at line %s of %s" % (method, line, fileName))
+    sys.exit(1)

@@ -1,5 +1,10 @@
 
-""" snake.py will be source of the actual game """
+# CSCI 4478 - Dr Vahid Behzadan
+# Name: game.py
+# Description: Classes to run a game of snake
+# Reference: https://www.youtube.com/watch?v=CD4qAhfFuLo&t=1734s
+# Reference: https://pastebin.com/embed_js/jB6k06hG
+# Revision: 4/22/2021
 
 import math
 import random
@@ -38,7 +43,7 @@ class cube(object):
             pygame.draw.circle(surface, (0, 0, 0), circleMiddle2, radius)
 
 
-class snake(object):
+class Snake(object):
     body = []
     turns = {}
 
@@ -263,7 +268,7 @@ def main():
     width = 500
     rows = 20
     win = pygame.display.set_mode((width, width))
-    s = snake((255, 0, 0), (10, 10))
+    s = Snake((255, 0, 0), (10, 10))
     snack = cube(randomSnack(rows, s), color=(0, 255, 0))
     global food
     food = snack
@@ -296,6 +301,45 @@ def main():
         s.isGoalState(s.head.pos)
 
 
+# -------------------------------------------------------- Game Framework
+# 1. todo: command parser needs to work for changing a map or changing an algorithm
+    # for instance it should work with gowest, tinymaze, bfs, dfs, any else
+# def readCommand(argv):
+    """
+    Processes snake game arguments from command line
+    """
+
+    from optparse import OptionParser
+    # usageStr = """
+    # USAGE:      python snake.py <options>
+    # EX)         python snake.py
+    #                 begins user controlled game
+    #             python pacman.py --layout tinyMaze --pacman GoWestAgent
+    
+
+    # parser = OptionParser(usageStr)
+
+    # parser.add_option('-l', '--layout', dest='layout',
+    #                   help=default('the LAYOUT_FILE from which to load the map layout'),
 
 
-# main()
+# if __name__ == '__main__':
+    """
+    # The main function called when pacman.py is run
+    # from the command line:
+
+    # > python pacman.py
+
+    # See the usage string for more details.
+
+    # > python pacman.py --help
+    """
+    # args = readCommand( sys.argv[1:] ) # Get game components based on input
+    # runGames( **args )
+
+    # import cProfile
+    # cProfile.run("runGames( **args )")
+    # pass
+# -------------------------------------------------------- End of Game Framework
+
+main()

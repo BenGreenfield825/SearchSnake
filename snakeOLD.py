@@ -1,6 +1,10 @@
-# Snake Tutorial Python
 
-"""Raw unedited source for snake game code. Make edits in snakeOLD.py"""
+# CSCI 4478 - Dr Vahid Behzadan
+# Name: game.py
+# Description: Classes to run a game of snake
+# Reference: https://www.youtube.com/watch?v=CD4qAhfFuLo&t=1734s
+# Reference: https://pastebin.com/embed_js/jB6k06hG
+# Revision: 4/22/2021
 
 import math
 import random
@@ -50,6 +54,9 @@ class snake(object):
         self.dirnx = 0
         self.dirny = 1
 
+        self.walls = []
+        self.walls.append(self.head)
+
     def move(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -58,6 +65,7 @@ class snake(object):
             keys = pygame.key.get_pressed()
 
             for key in keys:
+                # print("Head position:", self.head.pos) # lets us see grid pos for head
                 if keys[pygame.K_LEFT]:
                     self.dirnx = -1
                     self.dirny = 0
@@ -111,12 +119,19 @@ class snake(object):
 
         if dx == 1 and dy == 0:
             self.body.append(cube((tail.pos[0] - 1, tail.pos[1])))
+            self.walls = self.body
         elif dx == -1 and dy == 0:
             self.body.append(cube((tail.pos[0] + 1, tail.pos[1])))
+            self.walls = self.body
         elif dx == 0 and dy == 1:
             self.body.append(cube((tail.pos[0], tail.pos[1] - 1)))
+            self.walls = self.body
         elif dx == 0 and dy == -1:
             self.body.append(cube((tail.pos[0], tail.pos[1] + 1)))
+            self.walls = self.body
+
+        # for index, position in enumerate(self.walls):
+        #     print("Walls:", position.pos)
 
         self.body[-1].dirnx = dx
         self.body[-1].dirny = dy
@@ -127,6 +142,69 @@ class snake(object):
                 c.draw(surface, True)
             else:
                 c.draw(surface)
+
+    def isGoalState(self, current_pos):
+        # todo: Current pos is being looked at after the food has already been eaten, so the food is in a different spot, hence if statement is never true
+        # print("current:", current_pos)
+        # print("food:", food.pos)
+        if current_pos == food.pos:
+            print("Goal state!")
+            return True
+        else:
+            return False
+
+    def getSuccessors(self, current_pos):    # more like surrounding grid positions
+        """returns a tuple of states, actions, costs"""
+
+        '''Theoretically the max # of successors that can be generated at once should be 3: in front of the head,
+        and the two sides of the head (if we have not eaten food yet we can have 4 successors). We will also make it so
+        that the snake can not wrap around the screen.'''
+
+        # todo: Currently body right behind the head is being added to successors (I assume other walls will be too).
+        successors = []  # tuple of states, actions, cost (grid pos, direction to get there, cost to get there)
+        x, y = current_pos
+        possible_moves = [-1, 1] # x or y can either stay, increase or decrease position by 1
+        # either x or y can move, but not both at a time
+        # print("Current pos:", current_pos)
+        for movesX in possible_moves:
+            nextX = x + movesX   # x will move, y will stay the same
+            nextY = y
+            if nextX < 0 or nextX > 19: # make sure we don't go out of bounds
+                continue
+            nextState = nextX, nextY
+            print("Current pos2:", current_pos, "next:", nextState)
+            for fuck, noU in enumerate(self.walls):
+                print("walls:", noU.pos)
+            if nextState in self.walls:
+                print("FFFFFFFFFFFFFFFFF")
+                break
+            for index, wallX in enumerate(self.walls):
+                # print("wall.pos:", wall.pos)
+                # print("next:", nextState)
+                if wallX.pos != nextState:   # if nextState we generated is not a wall
+                    if nextState != current_pos:
+                        if nextState not in successors:
+                            successors.append(nextState)
+
+        for moves in possible_moves:
+            nextX = x
+            nextY = y + moves # y will move, x will stay the same
+            if nextY < 0 or nextY > 19: # make sure we don't go out of bounds
+                continue
+            nextState = nextX, nextY
+            if nextState in self.walls:
+                print("FFFFFFFFFFFFFFFFF")
+                break
+            for index, wallY in enumerate(self.walls):
+                # print("wally:", wallY.pos)
+                # print("next:", nextState)
+                if wallY.pos != nextState:   # if nextState we generated is not a wall
+                    if nextState != current_pos:
+                        if nextState not in successors:
+                            successors.append(nextState)
+
+        print("Successors:", successors)
+        return successors
 
 
 def drawGrid(w, rows, surface):
@@ -149,6 +227,7 @@ def redrawWindow(surface):
     snack.draw(surface)
     drawGrid(width, rows, surface)
     pygame.display.update()
+    # print("yum:", food.pos)
 
 
 def randomSnack(rows, item):
@@ -176,6 +255,14 @@ def message_box(subject, content):
         pass
 
 
+def getSnack(yumyum):
+    pass
+
+
+# global food
+food = []
+
+
 def main():
     global width, rows, s, snack
     width = 500
@@ -183,28 +270,37 @@ def main():
     win = pygame.display.set_mode((width, width))
     s = snake((255, 0, 0), (10, 10))
     snack = cube(randomSnack(rows, s), color=(0, 255, 0))
+    global food
+    food = snack
     flag = True
 
     clock = pygame.time.Clock()
 
     while flag:
+        # for index, position in enumerate(s.walls):  # we can use this to see current walls (basically our body)
+        #     print("Walls:", position.pos)
         pygame.time.delay(50)
         clock.tick(10)
         s.move()
         if s.body[0].pos == snack.pos:
             s.addCube()
             snack = cube(randomSnack(rows, s), color=(0, 255, 0))
+            food = snack
 
         for x in range(len(s.body)):
             if s.body[x].pos in list(map(lambda z: z.pos, s.body[x + 1:])):
-                print(\'Score: \', len(s.body))
-                message_box(\'You Lost!\', \'Play again...\')
+                # print(\'Score: \', len(s.body))
+                # message_box(\'You Lost!\', \'Play again...\')
                 s.reset((10, 10))
                 break
 
         redrawWindow(win)
 
-    pass
+        # test line
+        s.getSuccessors(s.head.pos) # the head's position works as our current position
+        s.isGoalState(s.head.pos)
 
 
-# main()
+
+
+main()
