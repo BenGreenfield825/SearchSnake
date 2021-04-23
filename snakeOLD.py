@@ -147,7 +147,9 @@ class snake(object):
         # todo: Current pos is being looked at after the food has already been eaten, so the food is in a different spot, hence if statement is never true
         # print("current:", current_pos)
         # print("food:", food.pos)
-        if current_pos == food.pos:
+        # if current_pos == food.pos:
+        print("tempFood:", tempFood.pos)
+        if current_pos == tempFood.pos:
             print("Goal state!")
             return True
         else:
@@ -261,6 +263,7 @@ def getSnack(yumyum):
 
 # global food
 food = []
+tempFood = []
 
 
 def main():
@@ -270,8 +273,9 @@ def main():
     win = pygame.display.set_mode((width, width))
     s = snake((255, 0, 0), (10, 10))
     snack = cube(randomSnack(rows, s), color=(0, 255, 0))
-    global food
+    global food, tempFood
     food = snack
+    tempFood = snack
     flag = True
 
     clock = pygame.time.Clock()
@@ -285,7 +289,9 @@ def main():
         if s.body[0].pos == snack.pos:
             s.addCube()
             snack = cube(randomSnack(rows, s), color=(0, 255, 0))
-            food = snack
+            tempFood = food  # use this as testing to try to get food value before it changes
+            food = snack    # update food to new value
+
 
         for x in range(len(s.body)):
             if s.body[x].pos in list(map(lambda z: z.pos, s.body[x + 1:])):
