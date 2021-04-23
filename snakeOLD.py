@@ -144,11 +144,6 @@ class snake(object):
                 c.draw(surface)
 
     def isGoalState(self, current_pos):
-        # todo: Current pos is being looked at after the food has already been eaten, so the food is in a different spot, hence if statement is never true
-        # print("current:", current_pos)
-        # print("food:", food.pos)
-        # if current_pos == food.pos:
-        print("tempFood:", tempFood.pos)
         if current_pos == tempFood.pos:
             print("Goal state!")
             return True
@@ -255,10 +250,6 @@ def message_box(subject, content):
         root.destroy()
     except:
         pass
-
-
-def getSnack(yumyum):
-    pass
 
 
 # global food
