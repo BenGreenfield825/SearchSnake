@@ -210,170 +210,50 @@ class snake(object):
         and the two sides of the head (if we have not eaten food yet we can have 4 successors). We will also make it so
         that the snake can not wrap around the screen.'''
 
+        wallPositions = []
+        for x, wall in enumerate(self.walls):
+            wallPositions.append(wall.pos)
         successors = []  # tuple of states, actions, cost (grid pos, direction to get there, cost to get there)
-        badSuccs = []
         x, y = current_pos
         possible_moves = [-1, 1]  # x or y can either stay, increase or decrease position by 1
-        # either x or y can move, but not both at a time
-        print("Current pos:", current_pos)
+        # print("Current pos:", current_pos)
+
+        # look at successors for y axis
         for movesX in possible_moves:
             nextX = x + movesX  # x will move, y will stay the same
             nextY = y
             if nextX < 0 or nextX > 19:  # make sure we don't go out of bounds
                 continue
             nextState = nextX, nextY
-            for index, wallX in enumerate(self.walls):
-                # print("wallX:", wallX.pos)
-                # print("next:", nextState)
-                if wallX.pos != nextState:  # if nextState we generated is not a wall
-                    # print("testX")
-                    if nextState in badSuccs:
-                        break
-                    if nextState != current_pos:
-                        if nextState not in successors:
-                            # directionX = 0
-                            # if movesX == 1:
-                            #     directionX = "RIGHT"
-                            # elif movesX == -1:
-                            #     directionX = "LEFT"
-                            # successors.append((nextState, directionX))
-                            successors.append(nextState)
-                else:
-                    print("bad succ:", nextState)
-                    badSuccs.append(nextState)
+            if nextState not in wallPositions:
+                if nextState != current_pos:
+                    if nextState not in successors:
+                        directionX = ""
+                        if movesX == 1:
+                            directionX = "RIGHT"
+                        elif movesX == -1:
+                            directionX = "LEFT"
+                        successors.append((nextState, directionX))
 
+        # look at successors for y axis
         for moves in possible_moves:
             nextX = x
             nextY = y + moves  # y will move, x will stay the same
             if nextY < 0 or nextY > 19:  # make sure we don't go out of bounds
                 continue
             nextState = nextX, nextY
-            for index, wallY in enumerate(self.walls):
-                # print("wally:", wallY.pos)
-                # print("next:", nextState)
-                if nextState != wallY.pos:  # if nextState we generated is not a wall
-                    # print("testY")
-                    if nextState in badSuccs:
-                        break
-                    if nextState != current_pos:
-                        if nextState not in successors:
-                            # directionY = 0
-                            # if moves == 1:
-                            #     # directionY = pygame.K_DOWN  # y axis increases towards bottom of screen
-                            #     directionY = "DOWN"
-                            # else:
-                            #     # directionY = pygame.K_UP
-                            #     directionY = "UP"
-                            # successors.append((nextState, directionY))
-                            successors.append(nextState)
-                else:
-                    print("bad succ:", nextState)
-                    badSuccs.append(nextState)
+            if nextState not in wallPositions:
+                if nextState != current_pos:
+                    if nextState not in successors:
+                        directionY = ""
+                        if moves == 1:
+                            directionY = "DOWN"
+                        elif moves == -1:
+                            directionY = "UP"
+                        successors.append((nextState, directionY))
 
-        for index, succ in enumerate(badSuccs):
-            # print(succ)
-            # print(index)
-            if succ in successors:
-                # print("un-succ:", succ)
-                # successors.pop(index)
-                successors.remove(succ)
         print("Successors:", successors)
         return successors
-
-    def getSuccessorsWithActions(self, current_pos):  # more like surrounding grid positions
-        """returns a tuple of states, actions, costs"""
-
-        '''Theoretically the max # of successors that can be generated at once should be 3: in front of the head,
-        and the two sides of the head (if we have not eaten food yet we can have 4 successors). We will also make it so
-        that the snake can not wrap around the screen.'''
-
-        # todo: something about adding actions sometimes generates an incorrect successor - normal generator works though
-        wallTest = []
-        for x, wall in enumerate(self.walls):
-            wallTest.append(wall.pos)
-        # print(wallTest)
-
-        successors = []  # tuple of states, actions, cost (grid pos, direction to get there, cost to get there)
-        badSuccs = []
-        x, y = current_pos
-        possible_moves = [-1, 1]  # x or y can either stay, increase or decrease position by 1
-        # either x or y can move, but not both at a time
-        print("Current pos:", current_pos)
-        for movesX in possible_moves:
-            nextX = x + movesX  # x will move, y will stay the same
-            nextY = y
-            if nextX < 0 or nextX > 19:  # make sure we don't go out of bounds
-                continue
-            nextState = nextX, nextY
-            if nextState in wallTest:
-                continue
-            for index, wallX in enumerate(self.walls):
-                # print("wallX:", wallX.pos)
-                # print("next:", nextState)
-                if wallX.pos != nextState:  # if nextState we generated is not a wall
-                    # print("testX")
-                    if nextState in badSuccs:
-                        break
-                    if nextState != current_pos:
-                        if nextState not in successors:
-                            directionX = 0
-                            if movesX == 1:
-                                directionX = "RIGHT"
-                            elif movesX == -1:
-                                directionX = "LEFT"
-                            successors.append((nextState, directionX))
-                            # successors.append(nextState)
-                else:
-                    print("bad succ:", nextState)
-                    badSuccs.append(nextState)
-
-        for moves in possible_moves:
-            nextX = x
-            nextY = y + moves  # y will move, x will stay the same
-            if nextY < 0 or nextY > 19:  # make sure we don't go out of bounds
-                continue
-            nextState = nextX, nextY
-            if nextState in wallTest:
-                continue
-            for index, wallY in enumerate(self.walls):
-                # print("wally:", wallY.pos)
-                # print("next:", nextState)
-                if nextState != wallY.pos:  # if nextState we generated is not a wall
-                    # print("testY")
-                    if nextState in badSuccs:
-                        break
-                    if nextState != current_pos:
-                        if nextState not in successors:
-                            directionY = 0
-                            if moves == 1:
-                                # directionY = pygame.K_DOWN  # y axis increases towards bottom of screen
-                                directionY = "DOWN"
-                            else:
-                                # directionY = pygame.K_UP
-                                directionY = "UP"
-                            successors.append((nextState, directionY))
-                            # successors.append(nextState)
-                else:
-                    print("bad succ:", nextState)
-                    badSuccs.append(nextState)
-
-        for index, succ in enumerate(badSuccs):
-            # print(succ)
-            # print(index)
-            prevPos = 0
-            for pos in successors:
-                # print(pos[0])
-                if succ == pos[0]:
-                    # print("un-succ:", succ)
-                    # successors.pop(index)
-                    successors.remove(pos)
-        # successors started getting added twice when actions where added so this removes duplicates
-        successorsFinal = []
-        [successorsFinal.append(x) for x in successors if x not in successorsFinal]
-        print("successorsFinal:", successorsFinal)
-        # print("Successors:", successors)
-        return successorsFinal
-        # return successors
 
 
 def drawGrid(w, rows, surface):
@@ -469,8 +349,7 @@ def main():
         redrawWindow(win)
 
         # test line
-        # s.getSuccessors(s.head.pos) # the head's position works as our current position
-        s.getSuccessorsWithActions(s.head.pos)
+        s.getSuccessors(s.head.pos) # the head's position works as our current position
         s.isGoalState(s.head.pos)
 
 
