@@ -181,8 +181,8 @@ class snake(object):
             self.body.append(cube((tail.pos[0], tail.pos[1] + 1)))
             self.walls = self.body
 
-        # for index, position in enumerate(self.walls):
-        #     print("Walls:", position.pos)
+        global allWalls
+        allWalls = self.body
 
         self.body[-1].dirnx = dx
         self.body[-1].dirny = dy
@@ -210,26 +210,24 @@ class snake(object):
 
         # todo: Currently body right behind the head is being added to successors (I assume other walls will be too).
         successors = []  # tuple of states, actions, cost (grid pos, direction to get there, cost to get there)
+        badSuccs = []
         x, y = current_pos
         possible_moves = [-1, 1] # x or y can either stay, increase or decrease position by 1
         # either x or y can move, but not both at a time
-        # print("Current pos:", current_pos)
+        print("Current pos:", current_pos)
         for movesX in possible_moves:
             nextX = x + movesX   # x will move, y will stay the same
             nextY = y
             if nextX < 0 or nextX > 19: # make sure we don't go out of bounds
                 continue
             nextState = nextX, nextY
-            # print("Current pos2:", current_pos, "next:", nextState)
-            # for fuck, noU in enumerate(self.walls):
-            #     print("walls:", noU.pos)
-            if nextState in self.walls:
-                print("FFFFFFFFFFFFFFFFF")
-                break
             for index, wallX in enumerate(self.walls):
-                # print("wall.pos:", wall.pos)
+                # print("wallX:", wallX.pos)
                 # print("next:", nextState)
-                if wallX.pos[0] != nextState[0] and wallX.pos[1] != nextState[1]:   # if nextState we generated is not a wall
+                if wallX.pos != nextState:   # if nextState we generated is not a wall
+                    # print("testX")
+                    if nextState in badSuccs:
+                        break
                     if nextState != current_pos:
                         if nextState not in successors:
                             # directionX = 0
@@ -239,6 +237,9 @@ class snake(object):
                             #     directionX = "LEFT"
                             # successors.append((nextState, directionX))
                             successors.append(nextState)
+                else:
+                    print("bad succ:", nextState)
+                    badSuccs.append(nextState)
 
         for moves in possible_moves:
             nextX = x
@@ -246,13 +247,13 @@ class snake(object):
             if nextY < 0 or nextY > 19: # make sure we don't go out of bounds
                 continue
             nextState = nextX, nextY
-            if nextState in self.walls:
-                print("FFFFFFFFFFFFFFFFF")
-                break
             for index, wallY in enumerate(self.walls):
                 # print("wally:", wallY.pos)
                 # print("next:", nextState)
-                if wallY.pos[0] != nextState[0] and wallY.pos[1] != nextState[1]:   # if nextState we generated is not a wall
+                if nextState != wallY.pos:   # if nextState we generated is not a wall
+                    # print("testY")
+                    if nextState in badSuccs:
+                        break
                     if nextState != current_pos:
                         if nextState not in successors:
                             # directionY = 0
@@ -264,21 +265,17 @@ class snake(object):
                             #     directionY = "UP"
                             # successors.append((nextState, directionY))
                             successors.append(nextState)
-        count = 0
-        # for succ in successors:
-        #     # print("succ:", succ[0][0])
-        #     # for wall in self.walls:
-        #     #     print("wall:", wall.pos)
-        #     if succ[0] in self.walls:
-        #         print("BRUH!")
-        #         successors.pop(count)
-        #     count += 1
-        # for succ in successors:
-        #     for wall in self.walls:
-        #         if succ[0][0] == wall.pos[0] and succ[0][1] == wall.pos[1]:
-        #             print("penis")
-        #             successors.pop()
-        #     count += 1
+                else:
+                    print("bad succ:", nextState)
+                    badSuccs.append(nextState)
+
+        for index, succ in enumerate(badSuccs):
+            # print(succ)
+            # print(index)
+            if succ in successors:
+                # print("un-succ:", succ)
+                # successors.pop(index)
+                successors.remove(succ)
         print("Successors:", successors)
         return successors
 
@@ -334,6 +331,7 @@ def message_box(subject, content):
 # global food
 food = []
 tempFood = []
+allWalls = []
 
 
 def main():
