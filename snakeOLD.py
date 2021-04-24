@@ -164,6 +164,8 @@ class snake(object):
         self.dirnx = 0
         self.dirny = 1
 
+        self.walls = self.body
+
     def addCube(self):
         tail = self.body[-1]
         dx, dy = tail.dirnx, tail.dirny
@@ -416,7 +418,6 @@ def message_box(subject, content):
 # global food
 food = []
 tempFood = []
-allWalls = []
 
 
 def main():
@@ -450,8 +451,9 @@ def main():
 
         for x in range(len(s.body)):
             if s.body[x].pos in list(map(lambda z: z.pos, s.body[x + 1:])):
-                # print(\'Score: \', len(s.body))
-                # message_box(\'You Lost!\', \'Play again...\')
+                print('Score:', len(s.body))
+                # message_box('You Lost!\''', \'Play again...\'')
+                message_box("u die'd", "dead")
                 s.reset((10, 10))
                 break
 
