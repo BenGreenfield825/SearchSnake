@@ -288,6 +288,11 @@ class snake(object):
         that the snake can not wrap around the screen.'''
 
         # todo: something about adding actions sometimes generates an incorrect successor - normal generator works though
+        wallTest = []
+        for x, wall in enumerate(self.walls):
+            wallTest.append(wall.pos)
+        # print(wallTest)
+
         successors = []  # tuple of states, actions, cost (grid pos, direction to get there, cost to get there)
         badSuccs = []
         x, y = current_pos
@@ -300,6 +305,8 @@ class snake(object):
             if nextX < 0 or nextX > 19:  # make sure we don't go out of bounds
                 continue
             nextState = nextX, nextY
+            if nextState in wallTest:
+                continue
             for index, wallX in enumerate(self.walls):
                 # print("wallX:", wallX.pos)
                 # print("next:", nextState)
@@ -326,6 +333,8 @@ class snake(object):
             if nextY < 0 or nextY > 19:  # make sure we don't go out of bounds
                 continue
             nextState = nextX, nextY
+            if nextState in wallTest:
+                continue
             for index, wallY in enumerate(self.walls):
                 # print("wally:", wallY.pos)
                 # print("next:", nextState)
@@ -460,8 +469,8 @@ def main():
         redrawWindow(win)
 
         # test line
-        s.getSuccessors(s.head.pos) # the head's position works as our current position
-        # s.getSuccessorsWithActions(s.head.pos)
+        # s.getSuccessors(s.head.pos) # the head's position works as our current position
+        s.getSuccessorsWithActions(s.head.pos)
         s.isGoalState(s.head.pos)
 
 
