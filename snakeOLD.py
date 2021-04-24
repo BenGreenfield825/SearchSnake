@@ -371,5 +371,46 @@ def main2():
         redrawWindow(win)
 
 
+def search():
+    from util import Stack
+    global width, rows, s, snack, tempFood, startState
+    width = 500
+    rows = 20
+    win = pygame.display.set_mode((width, width))
+    startState = (10, 10)
+    s = snake((255, 0, 0), startState)
+    snack = cube(randomSnack(rows, s), color=(0, 255, 0))
+    tempFood = snack
+    print("food pos:", tempFood.pos)
+    clock = pygame.time.Clock()
+    flag = True
+
+    dfs_stack = Stack()  # fringe
+    visited = set()
+    dfs_stack.push((s.getStartState(), []))
+
+    while 1:
+        if dfs_stack.isEmpty():
+            print("Failure")
+            break
+        current, directions = dfs_stack.pop()  # popping the directions with the nodes gives optimal directions
+        print(current)
+        if current not in visited:
+            visited.add(current)
+            if s.isGoalState(current):
+                return directions
+            for childNode, direction in s.getSuccessors(current):  # we don't use cost but need it so we can iterate properly
+                if childNode not in dfs_stack.list:
+                    if childNode in visited:  # make sure child is not in visited so we don't go backwards
+                        continue
+                    dfs_stack.push((childNode, directions + [direction]))
+
+    for direction in directions:
+        pygame.time.delay(50)
+        clock.tick(10)
+        s.moveAuto(direction)
+        redrawWindow(win)
+
 # main2()
-main()
+# main()
+search()
