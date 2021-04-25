@@ -427,6 +427,63 @@ def dfs_search():
                     dfs_stack.push((childNode, directions + [direction]))
 
 
+def bfs_search():
+    from util import Queue
+    global width, rows, s, snack, tempFood, startState, food
+
+    def performActions(dirs):
+        for action in dirs:
+            pygame.time.delay(50)
+            clock.tick(10)
+            s.moveAuto(action)
+            redrawWindow(win)
+
+    width = 500
+    rows = 20
+    win = pygame.display.set_mode((width, width))
+    """food position can be hard coded to test results/performance"""
+    startState = (10, 10)
+    s = snake((255, 0, 0), startState)
+    snack = cube(randomSnack(rows, s), color=(0, 255, 0))
+    # snack = cube((12, 10), color=(0, 255, 0))
+    food = snack
+    tempFood = snack
+    print("food pos:", tempFood.pos)
+    clock = pygame.time.Clock()
+    flag = True
+
+    bfs_queue = Queue()  # fringe
+    visited = set()
+    bfs_queue.push((s.getStartState(), []))
+
+    while 1:
+        if bfs_queue.isEmpty():
+            print("Failure")
+            break
+        current, directions = bfs_queue.pop()  # popping the directions with the nodes gives optimal directions
+        print("Current pos:", current)
+        if current not in visited:
+            visited.add(current)
+            if s.isGoalState(current):
+                performActions(directions)
+                print("Number of actions:", len(directions))
+                message_box("Goal", ("Number of actions:", len(directions)))
+                break
+                # s.addCube()
+                # snack = cube(randomSnack(rows, s), color=(0, 255, 0))
+                # tempFood = food  # use this as testing to try to get food value before it changes
+                # food = snack  # update food to new value
+                # print("next food:", tempFood.pos)
+                # continue
+            for childNode, direction in s.getSuccessors(current):  # we don't use cost but need it so we can iterate properly
+                # print("childNode:", childNode, "direction:", direction)
+                if childNode not in bfs_queue.list:
+                    if childNode in visited:  # make sure child is not in visited so we don't go backwards
+                        continue
+                    bfs_queue.push((childNode, directions + [direction]))
+
+
 # main2()
 # main()
-dfs_search()
+# dfs_search()
+bfs_search()
