@@ -483,7 +483,72 @@ def bfs_search():
                     bfs_queue.push((childNode, directions + [direction]))
 
 
+def aStar_search():
+    from util import Queue
+    global width, rows, s, snack, tempFood, startState, food
+
+    def nullHeuristic(state, problem=None):
+        """
+        A heuristic function estimates the cost from the current state to the nearest
+        goal in the provided SearchProblem.  This heuristic is trivial.
+        """
+        return 0
+
+    def performActions(dirs):
+        for action in dirs:
+            pygame.time.delay(50)
+            clock.tick(10)
+            s.moveAuto(action)
+            redrawWindow(win)
+
+    width = 500
+    rows = 20
+    win = pygame.display.set_mode((width, width))
+    """food position can be hard coded to test results/performance"""
+    startState = (10, 10)
+    s = snake((255, 0, 0), startState)
+    snack = cube(randomSnack(rows, s), color=(0, 255, 0))
+    # snack = cube((12, 10), color=(0, 255, 0))
+    food = snack
+    tempFood = snack
+    print("food pos:", tempFood.pos)
+    clock = pygame.time.Clock()
+    flag = True
+
+    from util import PriorityQueue  # A* also uses a priority queue to decide which nodes to go to based on heuristic
+    aStar_priorityqueue = PriorityQueue()  # fringe
+    visited = set()
+    aStar_priorityqueue.push((s.getStartState(), [], 0), 0)
+
+    while 1:
+        if aStar_priorityqueue.isEmpty():
+            print("Failure")
+            break
+        current, directions, costs = aStar_priorityqueue.pop()  # add costs for ucs
+        # print("Current:", current)
+        if current not in visited:
+            visited.add(current)
+            if s.isGoalState(current):
+                performActions(directions)
+                print("Number of actions:", len(directions))
+                message_box("Goal", ("Number of actions:", len(directions)))
+                break
+
+            for childNode, direction, cost in s.getSuccessors(current):
+                if childNode not in aStar_priorityqueue.heap:
+                    if childNode in visited:  # make sure child is not in visited so we don't go backwards
+                        continue
+                    # print(direction)
+                    # print(childNode, direction, cost)
+
+                    '''instead of just doing costs + cost, we also add in heuristic() so we can see the cost
+                    of the edges as well as the heuristic cost.'''
+                    hCost = costs + cost + nullHeuristic(childNode, s)
+                    aStar_priorityqueue.push((childNode, directions + [direction], costs + cost), hCost)
+
+
 # main2()
 # main()
 # dfs_search()
-bfs_search()
+# bfs_search()
+aStar_search()
