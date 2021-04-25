@@ -228,7 +228,7 @@ class snake(object):
                             directionX = "RIGHT"
                         elif movesX == -1:
                             directionX = "LEFT"
-                        successors.append((nextState, directionX))
+                        successors.append((nextState, directionX, 0))
 
         # look at successors for y axis
         for moves in possible_moves:
@@ -245,7 +245,7 @@ class snake(object):
                             directionY = "DOWN"
                         elif moves == -1:
                             directionY = "UP"
-                        successors.append((nextState, directionY))
+                        successors.append((nextState, directionY, 0))
 
         print("Successors:", successors)
         return successors
@@ -404,7 +404,7 @@ def dfs_search():
         if dfs_stack.isEmpty():
             print("Failure")
             break
-        current, directions = dfs_stack.pop()  # popping the directions with the nodes gives optimal directions
+        current, directions = dfs_stack.pop()
         print("Current pos:", current)
         if current not in visited:
             visited.add(current)
@@ -419,10 +419,10 @@ def dfs_search():
                 # food = snack  # update food to new value
                 # print("next food:", tempFood.pos)
                 # continue
-            for childNode, direction in s.getSuccessors(current):  # we don't use cost but need it so we can iterate properly
+            for childNode, direction, cost in s.getSuccessors(current):
                 # print("childNode:", childNode, "direction:", direction)
                 if childNode not in dfs_stack.list:
-                    if childNode in visited:  # make sure child is not in visited so we don't go backwards
+                    if childNode in visited:
                         continue
                     dfs_stack.push((childNode, directions + [direction]))
 
@@ -460,7 +460,7 @@ def bfs_search():
         if bfs_queue.isEmpty():
             print("Failure")
             break
-        current, directions = bfs_queue.pop()  # popping the directions with the nodes gives optimal directions
+        current, directions = bfs_queue.pop()
         print("Current pos:", current)
         if current not in visited:
             visited.add(current)
@@ -475,10 +475,10 @@ def bfs_search():
                 # food = snack  # update food to new value
                 # print("next food:", tempFood.pos)
                 # continue
-            for childNode, direction in s.getSuccessors(current):  # we don't use cost but need it so we can iterate properly
+            for childNode, direction, cost in s.getSuccessors(current):
                 # print("childNode:", childNode, "direction:", direction)
                 if childNode not in bfs_queue.list:
-                    if childNode in visited:  # make sure child is not in visited so we don't go backwards
+                    if childNode in visited:
                         continue
                     bfs_queue.push((childNode, directions + [direction]))
 
