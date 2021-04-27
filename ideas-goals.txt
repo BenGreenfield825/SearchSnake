@@ -10,3 +10,7 @@
   action in the game so that all the methods of snake still work correctly.
 
 - Functions we need: getSuccessor, getActions, getIsGoalState, getStartState, getCostOfActions
+
+- For a summary we can have the different search algorithms run in a row and record metrics such as number of moves,
+  perhaps we can relate this to a score metric of some sort. We could also have a set list of food positions for each
+  search to run through. After, we can create charts and graphs displaying this information.

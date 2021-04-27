@@ -383,6 +383,7 @@ def feedDirections():
 
 # --------------------------------------------------------------------- DFS
 
+
 def dfs_search():
     from util import Stack
     global width, rows, s, snack, tempFood, startState, food
@@ -444,6 +445,7 @@ def dfs_search():
 # --------------------------------------------------------------------- End DFS
 
 # --------------------------------------------------------------------- BFS
+
 
 def bfs_search():
     from util import Queue
@@ -507,6 +509,8 @@ def bfs_search():
 
 
 # --------------------------------------------------------------------- A Star
+
+
 def aStar_search():
     from util import Queue
     global width, rows, s, snack, tempFood, startState, food
@@ -582,4 +586,6 @@ def runSearch():
     aStar_search()
     print(actionsList)
 
-runSearch()
+
+# runSearch()
+bfs_search()
