@@ -212,7 +212,7 @@ class snake(object):
         successors = []  # tuple of states, actions, cost (grid pos, direction to get there, cost to get there)
         x, y = current_pos
         possible_moves = [-1, 1]  # x or y can either stay, increase or decrease position by 1
-        print("Current pos (successor function):", current_pos)
+        # print("Current pos (successor function):", current_pos)
 
         # look at successors for y axis
         for movesX in possible_moves:
@@ -426,7 +426,8 @@ def dfs_search():
             if s.isGoalState(current):
                 performActions(directions)
                 print("Number of actions:", len(directions))
-                message_box("Goal", ("Number of actions:", len(directions)))
+                print("Score:", len(s.body))
+                message_box("Goal", ("Number of actions:", len(directions), "Score:", len(s.body)))
                 break
                 # s.addCube()
                 # snack = cube(randomSnack(rows, s), color=(0, 255, 0))
@@ -453,10 +454,18 @@ def bfs_searchTEST():
     global width, rows, s, snack, tempFood, startState, food
 
     def performActions(dirs):
+        # pass
         for action in dirs:
             pygame.time.delay(50)
             clock.tick(10)
             s.moveAuto(action)
+            for x in range(len(s.body)):
+                if s.body[x].pos in list(map(lambda z: z.pos, s.body[x + 1:])):
+                    print('Score:', len(s.body))
+                    # message_box('You Lost!\''', \'Play again...\'')
+                    message_box("u die'd", "dead")
+                    s.reset((10, 10))
+                    break
             redrawWindow(win)
 
     def search():
@@ -473,12 +482,14 @@ def bfs_searchTEST():
                 print("Failure")
                 break
             current, directions = bfs_queue.pop()
-            print("Current pos:", current)
+            # print("Current pos:", current)
             if current not in visited:
                 visited.add(current)
                 if s.isGoalState(current):
+                    # todo: food pos and current pos line up - so it might be an error with drawing on the screen
                     performActions(directions)
                     print("Number of actions:", len(directions))
+                    print('Score:', len(s.body))
                     # message_box("Goal", ("Number of actions:", len(directions)))
                     s.addCube()
                     search()
@@ -549,7 +560,8 @@ def bfs_search():
             if s.isGoalState(current):
                 performActions(directions)
                 print("Number of actions:", len(directions))
-                message_box("Goal", ("Number of actions:", len(directions)))
+                print("Score:", len(s.body))
+                message_box("Goal", ("Number of actions:", len(directions), "Score:", len(s.body)))
                 break
                 # s.addCube()
                 # snack = cube(randomSnack(rows, s), color=(0, 255, 0))
@@ -621,7 +633,8 @@ def aStar_search():
             if s.isGoalState(current):
                 performActions(directions)
                 print("Number of actions:", len(directions))
-                message_box("Goal", ("Number of actions:", len(directions)))
+                print("Score:", len(s.body))
+                message_box("Goal", ("Number of actions:", len(directions), "Score:", len(s.body)))
                 break
 
             for childNode, direction, cost in s.getSuccessors(current):
@@ -649,4 +662,5 @@ def runSearch():
 
 
 # runSearch()
-bfs_search()
+# bfs_searchTEST()
+aStar_search()
