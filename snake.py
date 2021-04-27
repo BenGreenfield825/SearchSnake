@@ -212,7 +212,7 @@ class snake(object):
         successors = []  # tuple of states, actions, cost (grid pos, direction to get there, cost to get there)
         x, y = current_pos
         possible_moves = [-1, 1]  # x or y can either stay, increase or decrease position by 1
-        # print("Current pos:", current_pos)
+        print("Current pos (successor function):", current_pos)
 
         # look at successors for y axis
         for movesX in possible_moves:
@@ -248,7 +248,8 @@ class snake(object):
                             directionY = "UP"
                         successors.append((nextState, directionY, 0))
 
-        print("Successors:", successors)
+        # todo: toggle to see successors
+        # print("Successors:", successors)
         return successors
 
 
@@ -445,6 +446,66 @@ def dfs_search():
 # --------------------------------------------------------------------- End DFS
 
 # --------------------------------------------------------------------- BFS
+
+
+def bfs_searchTEST():
+    from util import Queue
+    global width, rows, s, snack, tempFood, startState, food
+
+    def performActions(dirs):
+        for action in dirs:
+            pygame.time.delay(50)
+            clock.tick(10)
+            s.moveAuto(action)
+            redrawWindow(win)
+
+    def search():
+        global snack, food, tempFood
+        bfs_queue = Queue()  # fringe
+        visited = set()
+        snack = cube(randomSnack(rows, s), color=(0, 255, 0))
+        food = snack
+        tempFood = snack
+        print("food pos:", food.pos)
+        bfs_queue.push((s.getStartState(), []))
+        while 1:
+            if bfs_queue.isEmpty():
+                print("Failure")
+                break
+            current, directions = bfs_queue.pop()
+            print("Current pos:", current)
+            if current not in visited:
+                visited.add(current)
+                if s.isGoalState(current):
+                    performActions(directions)
+                    print("Number of actions:", len(directions))
+                    # message_box("Goal", ("Number of actions:", len(directions)))
+                    s.addCube()
+                    search()
+                for childNode, direction, cost in s.getSuccessors(current):
+                    if childNode not in bfs_queue.list:
+                        if childNode in visited:
+                            continue
+                        bfs_queue.push((childNode, directions + [direction]))
+
+    width = 500
+    rows = 20
+    win = pygame.display.set_mode((width, width))
+    """food position can be hard coded to test results/performance"""
+    startState = (10, 10)
+    s = snake((255, 0, 0), startState)
+    s.reset(startState)
+    # snack = cube(randomSnack(rows, s), color=(0, 255, 0))
+    # snack = cube((12, 10), color=(0, 255, 0))
+
+    # print("food pos:", tempFood.pos)
+    clock = pygame.time.Clock()
+    flag = True
+
+    search()
+
+
+    # actionsList[1] = len(directions)
 
 
 def bfs_search():
