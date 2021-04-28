@@ -452,71 +452,72 @@ def dfs_search():
 
 # --------------------------------------------------------------------- End DFS
 
-# def bfs_searchTEST():
-#     from util import Queue
-#     global width, rows, s, snack, tempFood, startState, food
-#
-#     def performActions(dirs):
-#         # pass
-#         for action in dirs:
-#             pygame.time.delay(50)
-#             clock.tick(10)
-#             s.moveAuto(action)
-#             for x in range(len(s.body)):
-#                 if s.body[x].pos in list(map(lambda z: z.pos, s.body[x + 1:])):
-#                     print('Score:', len(s.body))
-#                     # message_box('You Lost!\''', \'Play again...\'')
-#                     message_box("u die'd", "dead")
-#                     s.reset((10, 10))
-#                     break
-#             redrawWindow(win)
-#
-#     def search():
-#         global snack, food, tempFood
-#         bfs_queue = Queue()  # fringe
-#         visited = set()
-#         snack = cube(randomSnack(rows, s), color=(0, 255, 0))
-#         food = snack
-#         tempFood = snack
-#         print("food pos:", food.pos)
-#         bfs_queue.push((s.getStartState(), []))
-#         while 1:
-#             if bfs_queue.isEmpty():
-#                 print("Failure")
-#                 break
-#             current, directions = bfs_queue.pop()
-#             # print("Current pos:", current)
-#             if current not in visited:
-#                 visited.add(current)
-#                 if s.isGoalState(current):
-#                     # todo: food pos and current pos line up - so it might be an error with drawing on the screen
-#                     performActions(directions)
-#                     print("Number of actions:", len(directions))
-#                     print('Score:', len(s.body))
-#                     # message_box("Goal", ("Number of actions:", len(directions)))
-#                     s.addCube()
-#                     search()
-#                 for childNode, direction, cost in s.getSuccessors(current):
-#                     if childNode not in bfs_queue.list:
-#                         if childNode in visited:
-#                             continue
-#                         bfs_queue.push((childNode, directions + [direction]))
-#
-#     width = 500
-#     rows = 20
-#     win = pygame.display.set_mode((width, width))
-#     """food position can be hard coded to test results/performance"""
-#     startState = (10, 10)
-#     s = snake((255, 0, 0), startState)
-#     s.reset(startState)
-#     # snack = cube(randomSnack(rows, s), color=(0, 255, 0))
-#     # snack = cube((12, 10), color=(0, 255, 0))
-#
-#     # print("food pos:", tempFood.pos)
-#     clock = pygame.time.Clock()
-#     flag = True
-#
-#     search()
+
+def bfs_searchTEST():
+    from util import Queue
+    global width, rows, s, snack, tempFood, startState, food
+
+    def performActions(dirs):
+        # pass
+        for action in dirs:
+            pygame.time.delay(50)
+            clock.tick(10)
+            s.moveAuto(action)
+            for x in range(len(s.body)):
+                if s.body[x].pos in list(map(lambda z: z.pos, s.body[x + 1:])):
+                    print('Score:', len(s.body))
+                    # message_box('You Lost!\''', \'Play again...\'')
+                    message_box("u die'd", "dead")
+                    s.reset((10, 10))
+                    break
+            redrawWindow(win, s)
+
+    def search():
+        global snack, food, tempFood
+        bfs_queue = Queue()  # fringe
+        visited = set()
+        snack = cube(randomSnack(rows, s), color=(0, 255, 0))
+        food = snack
+        tempFood = snack
+        print("food pos:", food.pos)
+        bfs_queue.push((s.getStartState(), []))
+        while 1:
+            if bfs_queue.isEmpty():
+                print("Failure")
+                break
+            current, directions = bfs_queue.pop()
+            # print("Current pos:", current)
+            if current not in visited:
+                visited.add(current)
+                if s.isGoalState(current):
+                    # todo: food pos and current pos line up - so it might be an error with drawing on the screen
+                    # performActions(directions)
+                    print("Number of actions:", len(directions))
+                    print('Score:', len(s.body))
+                    # message_box("Goal", ("Number of actions:", len(directions)))
+                    s.addCube()
+                    search()
+                for childNode, direction, cost in s.getSuccessors(current):
+                    if childNode not in bfs_queue.list:
+                        if childNode in visited:
+                            continue
+                        bfs_queue.push((childNode, directions + [direction]))
+
+    width = 500
+    rows = 20
+    win = pygame.display.set_mode((width, width))
+    """food position can be hard coded to test results/performance"""
+    startState = (10, 10)
+    s = snake((255, 0, 0), startState)
+    s.reset(startState)
+    # snack = cube(randomSnack(rows, s), color=(0, 255, 0))
+    # snack = cube((12, 10), color=(0, 255, 0))
+
+    # print("food pos:", tempFood.pos)
+    clock = pygame.time.Clock()
+    flag = True
+
+    search()
 
 
     # actionsList[1] = len(directions)
@@ -669,6 +670,8 @@ def runSearch():
         # in parallel with the food array defined as a constant
         # please forgive it works with changing the food and the algortihm does stuff
         aStar_search(mySnake, i)
+        # u are forgave <3 (maybe bcuz idk what ur doing)
 
 
 runSearch()
+# our code appears to contain some... problems
