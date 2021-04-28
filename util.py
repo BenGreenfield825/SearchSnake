@@ -92,6 +92,10 @@ class PriorityQueue:
     def isEmpty(self):
         return len(self.heap) == 0
 
+    def makeEmpty(self):
+        while len(self.heap) != 0:
+            (_, _, item) = heapq.heappop(self.heap)
+
     def update(self, item, priority):
         # If item already in priority queue with higher priority, update its priority and rebuild the heap.
         # If item already in priority queue with equal or lower priority, do nothing.
