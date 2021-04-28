@@ -600,6 +600,13 @@ def aStar_search(s,i):
         """
         return 0
 
+    def manhattanHeuristic(position):
+        # todo: not tested yet
+        xy1 = position
+        # xy2 = problem.goal
+        xy2 = food.pos
+        return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+
     def performActions(dirs):
         for action in dirs:
             pygame.time.delay(50)
