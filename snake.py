@@ -391,6 +391,13 @@ def feedDirections(s):
 # DEFINE CONSTANTS
 
 START_POS = (0, 0)
+# FOOD_POS = []
+# for j in range(0, 399): # 400 grid positions, i.e. max num of food positions can be 400
+#     foodX = random.randrange(19)
+#     foodY = random.randrange(19)
+#     food = foodX, foodY
+#     print(food)
+#     FOOD_POS[j] = food
 FOOD_POS = [(10, 0), (0, 10), (10, 0), (0, 10), (10, 0)]
 # FOOD_POS = [(10, 0), (0, 10), (10, 10), (12, 10), (5, 5)] # did this for some other test values
 
@@ -412,15 +419,10 @@ def dfs_search(s, i):
     width = 500
     rows = 20
     win = pygame.display.set_mode((width, width))
-    """food position can be hard coded to test results/performance"""
     startState = START_POS
-    # s = snake((255, 0, 0), startState)
-    # s.reset(startState)
     snack = cube(FOOD_POS[i], color=(0, 255, 0))
-    # snack = cube((12, 10), color=(0, 255, 0))
     food = snack
     tempFood = snack
-    # print("food pos:", tempFood.pos)
     clock = pygame.time.Clock()
     flag = True
 
@@ -441,16 +443,7 @@ def dfs_search(s, i):
                 performActions(directions)
                 print("DFS number of actions:", len(directions))
                 print("DFS score:", len(s.body))
-                # message_box("Goal", ("Number of actions:", len(directions), "Score:", len(s.body)))
-                break
-                # s.addCube()
-                # snack = cube(randomSnack(rows, s), color=(0, 255, 0))
-                # tempFood = food  # use this as testing to try to get food value before it changes
-                # food = snack  # update food to new value
-                # print("next food:", tempFood.pos)
-                # continue
             for childNode, direction, cost in s.getSuccessors(current):
-                # print("childNode:", childNode, "direction:", direction)
                 if childNode not in dfs_stack.list:
                     if childNode in visited:
                         continue
@@ -596,7 +589,6 @@ def runSearch():
     for i in range(0, 5):
         bfs_search(mySnake, i)
     mySnake.reset(START_POS)
-    # todo: dfs is not adding cubes
     for i in range(0, 5):
         dfs_search(mySnake, i)
     mySnake.reset(START_POS)
@@ -609,4 +601,4 @@ def runSearch():
 
 
 runSearch()
-
+# todo: rn current method is that if the stack is empty we add a cube instead of failing which may be a problem later
