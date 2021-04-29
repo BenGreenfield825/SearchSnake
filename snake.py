@@ -420,7 +420,7 @@ def dfs_search(s, i):
     # snack = cube((12, 10), color=(0, 255, 0))
     food = snack
     tempFood = snack
-    print("food pos:", tempFood.pos)
+    # print("food pos:", tempFood.pos)
     clock = pygame.time.Clock()
     flag = True
 
@@ -434,13 +434,13 @@ def dfs_search(s, i):
             s.addCube()
             break
         current, directions = dfs_stack.pop()
-        print("Current pos:", current)
+        # print("Current pos:", current)
         if current not in visited:
             visited.add(current)
             if s.isGoalState(current):
                 performActions(directions)
-                print("Number of actions:", len(directions))
-                print("Score:", len(s.body))
+                print("DFS number of actions:", len(directions))
+                print("DFS score:", len(s.body))
                 # message_box("Goal", ("Number of actions:", len(directions), "Score:", len(s.body)))
                 break
                 # s.addCube()
@@ -560,7 +560,7 @@ def bfs_search(s, i):
     snack = cube(FOOD_POS[i], color=(0, 255, 0))
     food = snack
     tempFood = snack
-    print("food pos:", tempFood.pos)
+    # print("food pos:", tempFood.pos)
     clock = pygame.time.Clock()
     flag = True
 
@@ -574,13 +574,13 @@ def bfs_search(s, i):
             s.addCube()
             break
         current, directions = bfs_queue.pop()
-        print("Current pos:", current)
+        # print("Current pos:", current)
         if current not in visited:
             visited.add(current)
             if s.isGoalState(current):
                 performActions(directions)
-                print("Number of actions:", len(directions))
-                print("Score:", len(s.body))
+                print("BFS number of actions:", len(directions))
+                print("BFS score:", len(s.body))
                 # message_box("Goal", ("Number of actions:", len(directions), "Score:", len(s.body)))
                 # break
                 # s.addCube()
@@ -622,14 +622,10 @@ def aStar_search(s, i):
 
     def performActions(dirs):
         # perform actions in the game window so we can see the results
-        print(dirs)
         for action in dirs:
             pygame.time.delay(50)
             clock.tick(10)
             s.moveAuto(action)
-            # print(action)
-            print("current pos (perform actions):", s.head.pos)
-            # print("food pos:", food.pos)
             redrawWindow(win, s)
 
     width = 500
@@ -642,7 +638,7 @@ def aStar_search(s, i):
     # snack = cube((12, 10), color=(0, 255, 0))
     food = snack
     tempFood = snack
-    print("food pos:", tempFood.pos)
+    # print("food pos:", tempFood.pos)
     clock = pygame.time.Clock()
     flag = True
 
@@ -665,8 +661,8 @@ def aStar_search(s, i):
             visited.add(current)
             if s.isGoalState(current):
                 performActions(directions)
-                print("Number of actions:", len(directions))
-                print("Score:", len(s.body))
+                print("A_Star number of actions:", len(directions))
+                print("A_Star score:", len(s.body))
                 # message_box("Goal", ("Number of actions:", len(directions), "Score:", len(s.body)))
 
             for childNode, direction, cost in s.getSuccessors(current):
@@ -676,9 +672,9 @@ def aStar_search(s, i):
                     '''instead of just doing costs + cost, we also add in heuristic() so we can see the cost
                     of the edges as well as the heuristic cost.'''
                     # hCost = costs + cost + nullHeuristic(childNode, s)
-                    print("direction:", direction)
+                    # print("direction:", direction)
                     # print("childNode:", childNode)
-                    print("current:", current)
+                    # print("current:", current)
                     hCost = costs + cost + manhattanHeuristic(childNode)
                     aStar_priorityqueue.push((childNode, directions + [direction], costs + cost), hCost)
 
@@ -690,6 +686,9 @@ def aStar_search(s, i):
 
 def runSearch():
     mySnake = snake((255, 0, 0), START_POS)
+    # todo: Add functionality for randomly generated cubes that all search algorithms can use.
+
+    # commenting out the performActions() in each algorithm will let the searches run much faster with same results
     # message_box("aStar", "Starting aStar Search...")
     for i in range(0, 5):
         aStar_search(mySnake, i)
@@ -697,9 +696,16 @@ def runSearch():
     for i in range(0, 5):
         bfs_search(mySnake, i)
     mySnake.reset(START_POS)
+    # todo: dfs is not adding cubes
     for i in range(0, 5):
         dfs_search(mySnake, i)
     mySnake.reset(START_POS)
+
+    # todo: Scoring
+    """I'm thinking that we could do some sort of finalized score for each algorithm which would be some sort of
+    weighted average of body length + actions, as theoretically performance is technically determined by the length
+    of the body before it loses - some algorithms will fail before others. But it would also make sense to take
+    the number of actions they had to take into account."""
 
 
 runSearch()

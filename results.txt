@@ -1,0 +1,54 @@
+Results of search algorithms using
+FOOD_POS = [(10, 0), (0, 10), (10, 0), (0, 10), (10, 0)]
+(dfs needs work)
+
+Goal state!
+A_Star number of actions: 10
+A_Star score: 1
+Goal state!
+A_Star number of actions: 20
+A_Star score: 2
+Goal state!
+A_Star number of actions: 20
+A_Star score: 3
+Goal state!
+A_Star number of actions: 20
+A_Star score: 4
+Goal state!
+A_Star number of actions: 20
+A_Star score: 5
+Goal state!
+BFS number of actions: 10
+BFS score: 1
+Failure
+Goal state!
+BFS number of actions: 20
+BFS score: 2
+Failure
+Goal state!
+BFS number of actions: 20
+BFS score: 3
+Failure
+Goal state!
+BFS number of actions: 20
+BFS score: 4
+Failure
+Goal state!
+BFS number of actions: 20
+BFS score: 5
+Failure
+Goal state!
+DFS number of actions: 200
+DFS score: 1
+Goal state!
+DFS number of actions: 10
+DFS score: 1
+Goal state!
+DFS number of actions: 200
+DFS score: 1
+Goal state!
+DFS number of actions: 10
+DFS score: 1
+Goal state!
+DFS number of actions: 200
+DFS score: 1
