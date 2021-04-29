@@ -462,79 +462,6 @@ def dfs_search(s, i):
 # --------------------------------------------------------------------- End DFS
 
 
-def bfs_searchTEST():
-    from util import Queue
-    global width, rows, snack, tempFood, startState, food
-
-    def performActions(dirs, sObj):
-        # pass
-        for action in dirs:
-            # print(action)
-            # print(sObj.head.pos)
-            pygame.time.delay(50)
-            clock.tick(10)
-            sObj.moveAuto(action)
-            for x in range(len(sObj.body)):
-                if sObj.body[x].pos in list(map(lambda z: z.pos, sObj.body[x + 1:])):
-                    print('Score:', len(sObj.body))
-                    # message_box('You Lost!\''', \'Play again...\'')
-                    message_box("u die'd", "dead")
-                    sObj.reset((10, 10))
-                    break
-            redrawWindow(win, sObj)
-
-    def search(sObj):
-        global snack, food, tempFood
-        bfs_queue = Queue()  # fringe
-        visited = set()
-        snack = cube(randomSnack(rows, sObj), color=(0, 255, 0))
-        food = snack
-        tempFood = snack
-        print("food pos:", food.pos)
-        bfs_queue.push((sObj.getStartState(), []))
-        while 1:
-            if bfs_queue.isEmpty():
-                print("Failure")
-                break
-            current, directions = bfs_queue.pop()
-            # print("Current pos:", current)
-            if current not in visited:
-                visited.add(current)
-                if sObj.isGoalState(current):
-                    # todo: food pos and current pos line up - so it might be an error with drawing on the screen
-                    print(directions)
-                    performActions(directions, sObj)
-                    print("Number of actions:", len(directions))
-                    print('Score:', len(sObj.body))
-                    # message_box("Goal", ("Number of actions:", len(directions)))
-                    sObj.addCube()
-                    search(sObj)
-                    # bfs_searchTEST(sObj)
-                for childNode, direction, cost in sObj.getSuccessors(current):
-                    if childNode not in bfs_queue.list:
-                        if childNode in visited:
-                            continue
-                        bfs_queue.push((childNode, directions + [direction]))
-
-    width = 500
-    rows = 20
-    win = pygame.display.set_mode((width, width))
-    """food position can be hard coded to test results/performance"""
-    startState = (10, 10)
-    ns = snake((255, 0, 0), startState)
-    ns.reset(startState)
-    # snack = cube(randomSnack(rows, s), color=(0, 255, 0))
-    # snack = cube((12, 10), color=(0, 255, 0))
-
-    # print("food pos:", tempFood.pos)
-    clock = pygame.time.Clock()
-    flag = True
-
-    search(ns)
-
-    # actionsList[1] = len(directions)
-
-
 # --------------------------------------------------------------------- BFS
 
 def bfs_search(s, i):
@@ -551,16 +478,10 @@ def bfs_search(s, i):
     width = 500
     rows = 20
     win = pygame.display.set_mode((width, width))
-    """food position can be hard coded to test results/performance"""
     startState = START_POS
-    # s = snake((255, 0, 0), startState)
-    # s.reset(startState)
-    # snack = cube(FOOD_POS, color=(0, 255, 0))
-    # snack = cube((12, 10), color=(0, 255, 0))
     snack = cube(FOOD_POS[i], color=(0, 255, 0))
     food = snack
     tempFood = snack
-    # print("food pos:", tempFood.pos)
     clock = pygame.time.Clock()
     flag = True
 
@@ -581,16 +502,7 @@ def bfs_search(s, i):
                 performActions(directions)
                 print("BFS number of actions:", len(directions))
                 print("BFS score:", len(s.body))
-                # message_box("Goal", ("Number of actions:", len(directions), "Score:", len(s.body)))
-                # break
-                # s.addCube()
-                # snack = cube(randomSnack(rows, s), color=(0, 255, 0))
-                # tempFood = food  # use this as testing to try to get food value before it changes
-                # food = snack  # update food to new value
-                # print("next food:", tempFood.pos)
-                # continue
             for childNode, direction, cost in s.getSuccessors(current):
-                # print("childNode:", childNode, "direction:", direction)
                 if childNode not in bfs_queue.list:
                     if childNode in visited:
                         continue
@@ -631,18 +543,14 @@ def aStar_search(s, i):
     width = 500
     rows = 20
     win = pygame.display.set_mode((width, width))
-    """food position can be hard coded to test results/performance"""
     startState = START_POS
-
     snack = cube(FOOD_POS[i], color=(0, 255, 0))
-    # snack = cube((12, 10), color=(0, 255, 0))
     food = snack
     tempFood = snack
-    # print("food pos:", tempFood.pos)
     clock = pygame.time.Clock()
     flag = True
 
-    from util import PriorityQueue  # A* also uses a priority queue to decide which nodes to go to based on heuristic
+    from util import PriorityQueue
     aStar_priorityqueue = PriorityQueue()  # fringe
     visited = set()
     aStar_priorityqueue.push((s.getStartState(), [], 0), 0)
@@ -663,18 +571,10 @@ def aStar_search(s, i):
                 performActions(directions)
                 print("A_Star number of actions:", len(directions))
                 print("A_Star score:", len(s.body))
-                # message_box("Goal", ("Number of actions:", len(directions), "Score:", len(s.body)))
-
             for childNode, direction, cost in s.getSuccessors(current):
                 if childNode not in aStar_priorityqueue.heap:
                     if childNode in visited:  # make sure child is not in visited so we don't go backwards
                         continue
-                    '''instead of just doing costs + cost, we also add in heuristic() so we can see the cost
-                    of the edges as well as the heuristic cost.'''
-                    # hCost = costs + cost + nullHeuristic(childNode, s)
-                    # print("direction:", direction)
-                    # print("childNode:", childNode)
-                    # print("current:", current)
                     hCost = costs + cost + manhattanHeuristic(childNode)
                     aStar_priorityqueue.push((childNode, directions + [direction], costs + cost), hCost)
 
