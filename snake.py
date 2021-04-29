@@ -198,7 +198,9 @@ class snake(object):
             return False
 
     def getStartState(self):
-        return startState
+        # return startState
+        # i am such a huge idiot and i hate myself
+        return self.head.pos
 
     def getSuccessors(self, current_pos):  # more like surrounding grid positions
         """returns a tuple of states, actions, costs"""
@@ -213,7 +215,7 @@ class snake(object):
         successors = []  # tuple of states, actions, cost (grid pos, direction to get there, cost to get there)
         x, y = current_pos
         possible_moves = [-1, 1]  # x or y can either stay, increase or decrease position by 1
-        print("Current pos (successor function):", current_pos)
+        # print("Current pos (successor function):", current_pos)
 
         # look at successors for y axis
         for movesX in possible_moves:
@@ -250,7 +252,7 @@ class snake(object):
                         successors.append((nextState, directionY, 0))
 
         # todo: toggle to see successors
-        print("Successors:", successors)
+        # print("Successors:", successors)
         return successors
 
 
@@ -396,7 +398,7 @@ FOOD_POS = [(10, 0), (0, 10), (10, 0), (0, 10), (10, 0)]
 # --------------------------------------------------------------------- DFS
 
 
-def dfs_search():
+def dfs_search(s, i):
     from util import Stack
     global width, rows, snack, tempFood, startState, food
 
@@ -412,9 +414,9 @@ def dfs_search():
     win = pygame.display.set_mode((width, width))
     """food position can be hard coded to test results/performance"""
     startState = START_POS
-    s = snake((255, 0, 0), startState)
-    s.reset(startState)
-    snack = cube(FOOD_POS, color=(0, 255, 0))
+    # s = snake((255, 0, 0), startState)
+    # s.reset(startState)
+    snack = cube(FOOD_POS[i], color=(0, 255, 0))
     # snack = cube((12, 10), color=(0, 255, 0))
     food = snack
     tempFood = snack
@@ -429,6 +431,7 @@ def dfs_search():
     while 1:
         if dfs_stack.isEmpty():
             print("Failure")
+            s.addCube()
             break
         current, directions = dfs_stack.pop()
         print("Current pos:", current)
@@ -438,7 +441,7 @@ def dfs_search():
                 performActions(directions)
                 print("Number of actions:", len(directions))
                 print("Score:", len(s.body))
-                message_box("Goal", ("Number of actions:", len(directions), "Score:", len(s.body)))
+                # message_box("Goal", ("Number of actions:", len(directions), "Score:", len(s.body)))
                 break
                 # s.addCube()
                 # snack = cube(randomSnack(rows, s), color=(0, 255, 0))
@@ -461,32 +464,34 @@ def dfs_search():
 
 def bfs_searchTEST():
     from util import Queue
-    global width, rows, s, snack, tempFood, startState, food
+    global width, rows, snack, tempFood, startState, food
 
-    def performActions(dirs):
+    def performActions(dirs, sObj):
         # pass
         for action in dirs:
+            # print(action)
+            # print(sObj.head.pos)
             pygame.time.delay(50)
             clock.tick(10)
-            s.moveAuto(action)
-            for x in range(len(s.body)):
-                if s.body[x].pos in list(map(lambda z: z.pos, s.body[x + 1:])):
-                    print('Score:', len(s.body))
+            sObj.moveAuto(action)
+            for x in range(len(sObj.body)):
+                if sObj.body[x].pos in list(map(lambda z: z.pos, sObj.body[x + 1:])):
+                    print('Score:', len(sObj.body))
                     # message_box('You Lost!\''', \'Play again...\'')
                     message_box("u die'd", "dead")
-                    s.reset((10, 10))
+                    sObj.reset((10, 10))
                     break
-            redrawWindow(win, s)
+            redrawWindow(win, sObj)
 
-    def search():
+    def search(sObj):
         global snack, food, tempFood
         bfs_queue = Queue()  # fringe
         visited = set()
-        snack = cube(randomSnack(rows, s), color=(0, 255, 0))
+        snack = cube(randomSnack(rows, sObj), color=(0, 255, 0))
         food = snack
         tempFood = snack
         print("food pos:", food.pos)
-        bfs_queue.push((s.getStartState(), []))
+        bfs_queue.push((sObj.getStartState(), []))
         while 1:
             if bfs_queue.isEmpty():
                 print("Failure")
@@ -495,15 +500,17 @@ def bfs_searchTEST():
             # print("Current pos:", current)
             if current not in visited:
                 visited.add(current)
-                if s.isGoalState(current):
+                if sObj.isGoalState(current):
                     # todo: food pos and current pos line up - so it might be an error with drawing on the screen
-                    # performActions(directions)
+                    print(directions)
+                    performActions(directions, sObj)
                     print("Number of actions:", len(directions))
-                    print('Score:', len(s.body))
+                    print('Score:', len(sObj.body))
                     # message_box("Goal", ("Number of actions:", len(directions)))
-                    s.addCube()
-                    search()
-                for childNode, direction, cost in s.getSuccessors(current):
+                    sObj.addCube()
+                    search(sObj)
+                    # bfs_searchTEST(sObj)
+                for childNode, direction, cost in sObj.getSuccessors(current):
                     if childNode not in bfs_queue.list:
                         if childNode in visited:
                             continue
@@ -514,8 +521,8 @@ def bfs_searchTEST():
     win = pygame.display.set_mode((width, width))
     """food position can be hard coded to test results/performance"""
     startState = (10, 10)
-    s = snake((255, 0, 0), startState)
-    s.reset(startState)
+    ns = snake((255, 0, 0), startState)
+    ns.reset(startState)
     # snack = cube(randomSnack(rows, s), color=(0, 255, 0))
     # snack = cube((12, 10), color=(0, 255, 0))
 
@@ -523,14 +530,14 @@ def bfs_searchTEST():
     clock = pygame.time.Clock()
     flag = True
 
-    search()
+    search(ns)
 
     # actionsList[1] = len(directions)
 
 
 # --------------------------------------------------------------------- BFS
 
-def bfs_search(s):
+def bfs_search(s, i):
     from util import Queue
     global width, rows, snack, tempFood, startState, food
 
@@ -546,10 +553,11 @@ def bfs_search(s):
     win = pygame.display.set_mode((width, width))
     """food position can be hard coded to test results/performance"""
     startState = START_POS
-    s = snake((255, 0, 0), startState)
-    s.reset(startState)
-    snack = cube(FOOD_POS, color=(0, 255, 0))
+    # s = snake((255, 0, 0), startState)
+    # s.reset(startState)
+    # snack = cube(FOOD_POS, color=(0, 255, 0))
     # snack = cube((12, 10), color=(0, 255, 0))
+    snack = cube(FOOD_POS[i], color=(0, 255, 0))
     food = snack
     tempFood = snack
     print("food pos:", tempFood.pos)
@@ -563,6 +571,7 @@ def bfs_search(s):
     while 1:
         if bfs_queue.isEmpty():
             print("Failure")
+            s.addCube()
             break
         current, directions = bfs_queue.pop()
         print("Current pos:", current)
@@ -572,8 +581,8 @@ def bfs_search(s):
                 performActions(directions)
                 print("Number of actions:", len(directions))
                 print("Score:", len(s.body))
-                message_box("Goal", ("Number of actions:", len(directions), "Score:", len(s.body)))
-                break
+                # message_box("Goal", ("Number of actions:", len(directions), "Score:", len(s.body)))
+                # break
                 # s.addCube()
                 # snack = cube(randomSnack(rows, s), color=(0, 255, 0))
                 # tempFood = food  # use this as testing to try to get food value before it changes
@@ -613,6 +622,7 @@ def aStar_search(s, i):
 
     def performActions(dirs):
         # perform actions in the game window so we can see the results
+        print(dirs)
         for action in dirs:
             pygame.time.delay(50)
             clock.tick(10)
@@ -657,7 +667,7 @@ def aStar_search(s, i):
                 performActions(directions)
                 print("Number of actions:", len(directions))
                 print("Score:", len(s.body))
-                message_box("Goal", ("Number of actions:", len(directions), "Score:", len(s.body)))
+                # message_box("Goal", ("Number of actions:", len(directions), "Score:", len(s.body)))
 
             for childNode, direction, cost in s.getSuccessors(current):
                 if childNode not in aStar_priorityqueue.heap:
@@ -680,24 +690,17 @@ def aStar_search(s, i):
 
 def runSearch():
     mySnake = snake((255, 0, 0), START_POS)
-
+    # message_box("aStar", "Starting aStar Search...")
     for i in range(0, 5):
-        # uhhhh so pretty much i is passed in so that the food location can be
-        # in parallel with the food array defined as a constant
-        # please forgive it works with changing the food and the algortihm does stuff
-
-        # todo: current pos from successor function shows different data than current pos readout from search algo,
-        # successors print shows it in bounds, but search print shows snake going out of bounds. Perhaps it has to
-        # to do with multiple snake objects or maybe need to set bounds in search
-        # tbh maybe we'll just use the data that looks good kek
-
-        # after more testing it appears as though the problem has something to do with controlling the s.head.pos,
-        # printing data from inside search algo for loop DOES show correct data, however that data gets
-        # really funky when its sent to the perform action function
-
         aStar_search(mySnake, i)
-        # u are forgave <3 (maybe bcuz idk what ur doing)
+    mySnake.reset(START_POS)
+    for i in range(0, 5):
+        bfs_search(mySnake, i)
+    mySnake.reset(START_POS)
+    for i in range(0, 5):
+        dfs_search(mySnake, i)
+    mySnake.reset(START_POS)
 
 
 runSearch()
-# our code appears to contain some... problems
+
