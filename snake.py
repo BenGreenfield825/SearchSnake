@@ -701,12 +701,17 @@ def runSearch():
     my_file.write('{0:10}  {1:14}\n'.format("BFS ACTIONS:", BFS_actions))
     my_file.write('{0:10}  {1:14}\n'.format("DFS ACTIONS:", DFS_actions))
     my_file.write('{0:10}  {1:14}\n'.format("ASTAR ACTIONS:", AStar_actions))
-    my_file.write('{0:10}  {1:14}\n'.format("UCS ACTIONS:", UCS_actions))
+    my_file.write('{0:10}  {1:14}\n\n'.format("UCS ACTIONS:", UCS_actions))
+
+    my_file.write('{0:10}  {1:14}\n'.format("RAW BFS SCORE:", scoreList[0]))
+    my_file.write('{0:10}  {1:14}\n'.format("RAW DFS SCORE:", scoreList[1]))
+    my_file.write('{0:10}  {1:14}\n'.format("RAW ASTAR SCORE:", scoreList[2]))
+    my_file.write('{0:10}  {1:14}\n\n'.format("RAW UCS SCORE:", scoreList[3]))
 
     my_file.write('{0:10}  {1:14}\n'.format("BFS SCORE:", calcScores[0]))
     my_file.write('{0:10}  {1:14}\n'.format("DFS SCORE:", calcScores[1]))
     my_file.write('{0:10}  {1:14}\n'.format("ASTAR SCORE:", calcScores[2]))
-    my_file.write('{0:10}  {1:14}\n'.format("UCS SCORE:", calcScores[3]))
+    my_file.write('{0:10}  {1:14}\n\n'.format("UCS SCORE:", calcScores[3]))
     my_file.close()
 
     # Dictionary for graphing
