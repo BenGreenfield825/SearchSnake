@@ -312,7 +312,6 @@ def message_box(subject, content):
 
 
 # global food
-food = []
 tempFood = []
 startState = 0
 
@@ -404,7 +403,6 @@ for j in range(0, 399):  # 400 grid positions, i.e. max num of food positions ca
     # print(food)
     FOOD_POS.append(food)
 # FOOD_POS = [(10, 0), (0, 10), (10, 0), (0, 10), (10, 0)]
-# FOOD_POS = [(10, 0), (0, 10), (10, 10), (12, 10), (5, 5)] # did this for some other test values
 
 actionsList = [[], [], []]
 scoreList = [0, 0, 0]
@@ -432,7 +430,6 @@ def dfs_search(s, i, slow):
     win = pygame.display.set_mode((width, width))
     startState = START_POS
     snack = cube(FOOD_POS[i], color=(0, 255, 0))
-    food = snack
     tempFood = snack
     clock = pygame.time.Clock()
     flag = True
@@ -444,11 +441,6 @@ def dfs_search(s, i, slow):
     dead = False
     while 1:
         if dfs_stack.isEmpty():
-            # if not s.getSuccessors(s.head.pos):
-            #     dead = True
-            #     return dead # returned a var just so easier to understand
-            #     break
-            s.addCube()
             break
         current, directions = dfs_stack.pop()
         # print("Current pos:", current)
@@ -456,13 +448,13 @@ def dfs_search(s, i, slow):
             visited.add(current)
             if s.isGoalState(current):
                 s.score += 1
-                # print(s.score)
+                s.addCube()
                 performActions(directions, slow)
                 # print("DFS number of actions:", len(directions))
                 actionsList[0].append(len(directions))
                 # print("DFS score:", len(s.body))
-                # scoreList[0] = len(s.body)
-                scoreList[0] = s.score
+                scoreList[0] = len(s.body)
+                # scoreList[0] = s.score
             for childNode, direction, cost in s.getSuccessors(current):
                 if childNode not in dfs_stack.list:
                     if childNode in visited:
@@ -495,7 +487,6 @@ def bfs_search(s, i, slow):
     win = pygame.display.set_mode((width, width))
     startState = START_POS
     snack = cube(FOOD_POS[i], color=(0, 255, 0))
-    food = snack
     tempFood = snack
     clock = pygame.time.Clock()
     flag = True
@@ -506,9 +497,6 @@ def bfs_search(s, i, slow):
 
     while 1:
         if bfs_queue.isEmpty():
-            # if not s.getSuccessors(s.head.pos):
-            #     break
-            s.addCube()
             break
         current, directions = bfs_queue.pop()
         # print("Current pos:", current)
@@ -516,12 +504,13 @@ def bfs_search(s, i, slow):
             visited.add(current)
             if s.isGoalState(current):
                 s.score += 1
+                s.addCube()
                 performActions(directions, slow)
                 # print("BFS number of actions:", len(directions))
                 actionsList[1].append(len(directions))
                 # print("BFS score:", len(s.body))
-                # scoreList[1] = len(s.body)
-                scoreList[1] = s.score
+                scoreList[1] = len(s.body)
+                # scoreList[1] = s.score
             for childNode, direction, cost in s.getSuccessors(current):
                 if childNode not in bfs_queue.list:
                     if childNode in visited:
@@ -548,16 +537,15 @@ def aStar_search(s, i, slow):
     def manhattanHeuristic(position):
         # uses distance as a score for heuristic
         xy1 = position
-        # xy2 = problem.goal
         xy2 = food.pos
         return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
 
     def performActions(dirs, slow):
         # perform actions in the game window so we can see the results
         for action in dirs:
-            if not slow:
+            if slow:
                 pygame.time.delay(50)
-                clock.tick(100)
+                clock.tick(10)
             s.moveAuto(action)
             redrawWindow(win, s)
 
@@ -566,7 +554,6 @@ def aStar_search(s, i, slow):
     win = pygame.display.set_mode((width, width))
     startState = START_POS
     snack = cube(FOOD_POS[i], color=(0, 255, 0))
-    food = snack
     tempFood = snack
     clock = pygame.time.Clock()
     flag = True
@@ -578,9 +565,6 @@ def aStar_search(s, i, slow):
 
     while 1:
         if aStar_priorityqueue.isEmpty():
-            # if not s.getSuccessors(s.head.pos):
-            #     break
-            s.addCube()
             break
 
         current, directions, costs = aStar_priorityqueue.pop()  # add costs for ucs
@@ -589,13 +573,13 @@ def aStar_search(s, i, slow):
             visited.add(current)
             if s.isGoalState(current):
                 s.score += 1
+                s.addCube()
                 performActions(directions, slow)
-                print("A_Star number of actions:", len(directions))
+                # print("A_Star number of actions:", len(directions))
                 actionsList[2].append(len(directions))
-                print("A_Star score:", len(s.body))
-                print(s.score)
-                # scoreList[2] = len(s.body)
-                scoreList[2] = s.score
+                # print("A_Star score:", len(s.body))
+                scoreList[2] = len(s.body)
+                # scoreList[2] = s.score
             for childNode, direction, cost in s.getSuccessors(current):
                 if childNode not in aStar_priorityqueue.heap:
                     if childNode in visited:  # make sure child is not in visited so we don't go backwards
@@ -615,8 +599,6 @@ def runSearch():
     print("RUNNING DFS")
     for i in range(0, len(FOOD_POS)):
         dfs_search(mySnake, i, goSlow)
-        # if dfs_search(mySnake, i, goSlow):
-        #     break
     mySnake.reset(START_POS)
     print("RUNNING BFS")
     for i in range(0, len(FOOD_POS)):
@@ -680,12 +662,4 @@ def runSearch():
 
 
 runSearch()
-# todo: rn current method is that if the stack is empty we add a cube instead of failing which may be a problem later
-# update: its a problem :(
 
-"""I made it so that snake class has a score member. This member only increases if we hit isGoalState. This fixes
-score, but number of actions is still inaccurate as the program continues to behave strangely when run into a corner
-(it technically continues iteration even when stopped so it makes weird values). Even if we can't fix that part we can
-still tell how its performing based off the majority of the data it makes + just using score."""
-
-"""Note: *sometimes it completely breaks with the snake's body being in the wrong place but ima ignore that"""
