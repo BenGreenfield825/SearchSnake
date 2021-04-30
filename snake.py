@@ -167,6 +167,7 @@ class snake(object):
         self.dirny = 1
 
         self.walls = self.body
+        self.score = 0
 
     def addCube(self):
         tail = self.body[-1]
@@ -554,9 +555,9 @@ def aStar_search(s, i, slow):
     def performActions(dirs, slow):
         # perform actions in the game window so we can see the results
         for action in dirs:
-            if slow:
+            if not slow:
                 pygame.time.delay(50)
-                clock.tick(10)
+                clock.tick(100)
             s.moveAuto(action)
             redrawWindow(win, s)
 
@@ -589,9 +590,10 @@ def aStar_search(s, i, slow):
             if s.isGoalState(current):
                 s.score += 1
                 performActions(directions, slow)
-                # print("A_Star number of actions:", len(directions))
+                print("A_Star number of actions:", len(directions))
                 actionsList[2].append(len(directions))
-                # print("A_Star score:", len(s.body))
+                print("A_Star score:", len(s.body))
+                print(s.score)
                 # scoreList[2] = len(s.body)
                 scoreList[2] = s.score
             for childNode, direction, cost in s.getSuccessors(current):
@@ -636,10 +638,10 @@ def runSearch():
 
     # print("SCORES [ DFS, BFS, ASTAR ]: ")
     # print(scoreList)
-    calcScores = [0,0,0]
-    calcScores[0] = (scoreList[0]/DFS_actions)*100
-    calcScores[1] = (scoreList[1]/BFS_actions)*100
-    calcScores[2] = (scoreList[2]/AStar_actions)*100
+    calcScores = [0, 0, 0]
+    calcScores[0] = (scoreList[0] / DFS_actions) * 100
+    calcScores[1] = (scoreList[1] / BFS_actions) * 100
+    calcScores[2] = (scoreList[2] / AStar_actions) * 100
     print("DFS score:", calcScores[0])
     print("BFS score:", calcScores[1])
     print("A_Star score:", calcScores[2])
@@ -654,7 +656,6 @@ def runSearch():
     my_file.write('{0:10}  {1:14}\n'.format("ASTAR SCORE:", calcScores[2]))
     my_file.close()
 
-
     # Dictionary for graphing
     data = {"Algorithm": ["DFS", "BFS", "ASTAR"],
 
@@ -664,7 +665,8 @@ def runSearch():
     # Dictionary loaded into a DataFrame
     dataFrame = pd.DataFrame(data=data);
     # Draw a vertical bar chart
-    dataFrame.plot.bar(x="Algorithm", y="Score", rot=70, title="Scores of Snake Game Search Algorithms " + str(datetime.now()));
+    dataFrame.plot.bar(x="Algorithm", y="Score", rot=70,
+                       title="Scores of Snake Game Search Algorithms " + str(datetime.now()));
     plot.show(block=True);
 
     # example data table, lets do a dataframe created with actions table to analyze
@@ -675,6 +677,7 @@ def runSearch():
     # df = pd.DataFrame(data, columns=['First Column Name', 'Second Column Name', ...])
     #
     # print(df)
+
 
 runSearch()
 # todo: rn current method is that if the stack is empty we add a cube instead of failing which may be a problem later
