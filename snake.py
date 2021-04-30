@@ -11,6 +11,13 @@ import pygame
 import tkinter as tk
 from tkinter import messagebox
 
+# Graphing
+import pandas as pd
+import matplotlib.pyplot as plot
+from datetime import datetime
+
+file = "results.txt"
+
 
 # ------------------------------------------------- Code setting up the basics of the snake game
 
@@ -193,14 +200,12 @@ class snake(object):
 
     def isGoalState(self, current_pos):
         if current_pos == tempFood.pos:
-            print("Goal state!")
+            # print("Goal state!")
             return True
         else:
             return False
 
     def getStartState(self):
-        # return startState
-        # i am such a huge idiot and i hate myself
         return self.head.pos
 
     def getSuccessors(self, current_pos):  # more like surrounding grid positions
@@ -450,11 +455,11 @@ def dfs_search(s, i, slow):
             visited.add(current)
             if s.isGoalState(current):
                 s.score += 1
-                print(s.score)
+                # print(s.score)
                 performActions(directions, slow)
-                print("DFS number of actions:", len(directions))
+                # print("DFS number of actions:", len(directions))
                 actionsList[0].append(len(directions))
-                print("DFS score:", len(s.body))
+                # print("DFS score:", len(s.body))
                 # scoreList[0] = len(s.body)
                 scoreList[0] = s.score
             for childNode, direction, cost in s.getSuccessors(current):
@@ -511,9 +516,9 @@ def bfs_search(s, i, slow):
             if s.isGoalState(current):
                 s.score += 1
                 performActions(directions, slow)
-                print("BFS number of actions:", len(directions))
+                # print("BFS number of actions:", len(directions))
                 actionsList[1].append(len(directions))
-                print("BFS score:", len(s.body))
+                # print("BFS score:", len(s.body))
                 # scoreList[1] = len(s.body)
                 scoreList[1] = s.score
             for childNode, direction, cost in s.getSuccessors(current):
@@ -584,9 +589,9 @@ def aStar_search(s, i, slow):
             if s.isGoalState(current):
                 s.score += 1
                 performActions(directions, slow)
-                print("A_Star number of actions:", len(directions))
+                # print("A_Star number of actions:", len(directions))
                 actionsList[2].append(len(directions))
-                print("A_Star score:", len(s.body))
+                # print("A_Star score:", len(s.body))
                 # scoreList[2] = len(s.body)
                 scoreList[2] = s.score
             for childNode, direction, cost in s.getSuccessors(current):
@@ -605,20 +610,23 @@ def runSearch():
 
     goSlow = False
 
+    print("RUNNING DFS")
     for i in range(0, len(FOOD_POS)):
         dfs_search(mySnake, i, goSlow)
         # if dfs_search(mySnake, i, goSlow):
         #     break
     mySnake.reset(START_POS)
+    print("RUNNING BFS")
     for i in range(0, len(FOOD_POS)):
         bfs_search(mySnake, i, goSlow)
     mySnake.reset(START_POS)
+    print("RUNNING ASTAR")
     for i in range(0, len(FOOD_POS)):
         aStar_search(mySnake, i, goSlow)
     mySnake.reset(START_POS)
 
-    print("ACTIONS [ DFS, BFS, ASTAR ]: ")
-    print(actionsList)
+    # print("ACTIONS [ DFS, BFS, ASTAR ]: ")
+    # print(actionsList)
     DFS_actions = sum(actionsList[0])
     BFS_actions = sum(actionsList[1])
     AStar_actions = sum(actionsList[2])
@@ -626,16 +634,47 @@ def runSearch():
     print("Total BFS actions taken:", BFS_actions)
     print("Total A_Star actions taken:", AStar_actions)
 
-    print("SCORES [ DFS, BFS, ASTAR ]: ")
-    print(scoreList)
-    # todo: feel iffy about this scoring, need to make it so that actions is bad - dfs always wins because it has so many actions even though it always has lowest score
-    DFS_fScore = .8*scoreList[0] + .2*DFS_actions
-    BFS_fScore = .8*scoreList[1] + .2*BFS_actions
-    AStar_fScore = .8*scoreList[2] + .2*AStar_actions
-    print("Final DFS score:", DFS_fScore)
-    print("Final BFS score:", BFS_fScore)
-    print("Final A_Star score:", AStar_fScore)
+    # print("SCORES [ DFS, BFS, ASTAR ]: ")
+    # print(scoreList)
+    calcScores = [0,0,0]
+    calcScores[0] = (scoreList[0]/DFS_actions)*100
+    calcScores[1] = (scoreList[1]/BFS_actions)*100
+    calcScores[2] = (scoreList[2]/AStar_actions)*100
+    print("DFS score:", calcScores[0])
+    print("BFS score:", calcScores[1])
+    print("A_Star score:", calcScores[2])
 
+    my_file = open(file, "w")
+    my_file.write('{0:10}  {1:14}\n'.format("BFS ACTIONS:", DFS_actions))
+    my_file.write('{0:10}  {1:14}\n'.format("DFS ACTIONS:", BFS_actions))
+    my_file.write('{0:10}  {1:14}\n'.format("ASTAR ACTIONS:", BFS_actions))
+
+    my_file.write('{0:10}  {1:14}\n'.format("BFS SCORE:", calcScores[0]))
+    my_file.write('{0:10}  {1:14}\n'.format("DFS SCORE:", calcScores[1]))
+    my_file.write('{0:10}  {1:14}\n'.format("ASTAR SCORE:", calcScores[2]))
+    my_file.close()
+
+
+    # Dictionary for graphing
+    data = {"Algorithm": ["DFS", "BFS", "ASTAR"],
+
+            "Score": calcScores
+
+            };
+    # Dictionary loaded into a DataFrame
+    dataFrame = pd.DataFrame(data=data);
+    # Draw a vertical bar chart
+    dataFrame.plot.bar(x="Algorithm", y="Score", rot=70, title="Scores of Snake Game Search Algorithms " + str(datetime.now()));
+    plot.show(block=True);
+
+    # example data table, lets do a dataframe created with actions table to analyze
+    # data = {'First Column Name': ['First value', 'Second value', ...],
+    #         'Second Column Name': ['First value', 'Second value', ...]
+    #         }
+    #
+    # df = pd.DataFrame(data, columns=['First Column Name', 'Second Column Name', ...])
+    #
+    # print(df)
 
 runSearch()
 # todo: rn current method is that if the stack is empty we add a cube instead of failing which may be a problem later
