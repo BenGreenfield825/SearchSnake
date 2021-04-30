@@ -57,6 +57,7 @@ class snake(object):
 
         self.walls = []
         self.walls.append(self.head)
+        self.score = 0
 
     def move(self):
         for event in pygame.event.get():
@@ -390,18 +391,17 @@ def feedDirections(s):
 
 START_POS = (0, 0)
 FOOD_POS = []
-for j in range(0, 399): # 400 grid positions, i.e. max num of food positions can be 400
+for j in range(0, 399):  # 400 grid positions, i.e. max num of food positions can be 400
     foodX = random.randrange(19)
     foodY = random.randrange(19)
     food = foodX, foodY
-    print(food)
+    # print(food)
     FOOD_POS.append(food)
 # FOOD_POS = [(10, 0), (0, 10), (10, 0), (0, 10), (10, 0)]
 # FOOD_POS = [(10, 0), (0, 10), (10, 10), (12, 10), (5, 5)] # did this for some other test values
 
 actionsList = [[], [], []]
-scoreList = [0,0,0]
-
+scoreList = [0, 0, 0]
 
 
 # --------------------------------------------------------------------- DFS
@@ -435,8 +435,13 @@ def dfs_search(s, i, slow):
     visited = set()
     dfs_stack.push((s.getStartState(), []))
 
+    dead = False
     while 1:
         if dfs_stack.isEmpty():
+            # if not s.getSuccessors(s.head.pos):
+            #     dead = True
+            #     return dead # returned a var just so easier to understand
+            #     break
             s.addCube()
             break
         current, directions = dfs_stack.pop()
@@ -444,17 +449,19 @@ def dfs_search(s, i, slow):
         if current not in visited:
             visited.add(current)
             if s.isGoalState(current):
+                s.score += 1
+                print(s.score)
                 performActions(directions, slow)
                 print("DFS number of actions:", len(directions))
                 actionsList[0].append(len(directions))
                 print("DFS score:", len(s.body))
-                scoreList[0] = len(s.body)
+                # scoreList[0] = len(s.body)
+                scoreList[0] = s.score
             for childNode, direction, cost in s.getSuccessors(current):
                 if childNode not in dfs_stack.list:
                     if childNode in visited:
                         continue
                     dfs_stack.push((childNode, directions + [direction]))
-
 
 
 # --------------------------------------------------------------------- End DFS
@@ -493,6 +500,8 @@ def bfs_search(s, i, slow):
 
     while 1:
         if bfs_queue.isEmpty():
+            # if not s.getSuccessors(s.head.pos):
+            #     break
             s.addCube()
             break
         current, directions = bfs_queue.pop()
@@ -500,17 +509,18 @@ def bfs_search(s, i, slow):
         if current not in visited:
             visited.add(current)
             if s.isGoalState(current):
+                s.score += 1
                 performActions(directions, slow)
                 print("BFS number of actions:", len(directions))
                 actionsList[1].append(len(directions))
                 print("BFS score:", len(s.body))
-                scoreList[1] = len(s.body)
+                # scoreList[1] = len(s.body)
+                scoreList[1] = s.score
             for childNode, direction, cost in s.getSuccessors(current):
                 if childNode not in bfs_queue.list:
                     if childNode in visited:
                         continue
                     bfs_queue.push((childNode, directions + [direction]))
-
 
 
 # --------------------------------------------------------------------- DFS
@@ -562,10 +572,9 @@ def aStar_search(s, i, slow):
 
     while 1:
         if aStar_priorityqueue.isEmpty():
-            # aStar_priorityqueue.push((s.getStartState(), [], 0), 0)
+            # if not s.getSuccessors(s.head.pos):
+            #     break
             s.addCube()
-            # snack = cube(FOOD_POS[i], color=(0, 255, 0))
-
             break
 
         current, directions, costs = aStar_priorityqueue.pop()  # add costs for ucs
@@ -573,11 +582,13 @@ def aStar_search(s, i, slow):
         if current not in visited:
             visited.add(current)
             if s.isGoalState(current):
+                s.score += 1
                 performActions(directions, slow)
                 print("A_Star number of actions:", len(directions))
                 actionsList[2].append(len(directions))
                 print("A_Star score:", len(s.body))
-                scoreList[2] = len(s.body)
+                # scoreList[2] = len(s.body)
+                scoreList[2] = s.score
             for childNode, direction, cost in s.getSuccessors(current):
                 if childNode not in aStar_priorityqueue.heap:
                     if childNode in visited:  # make sure child is not in visited so we don't go backwards
@@ -586,22 +597,18 @@ def aStar_search(s, i, slow):
                     aStar_priorityqueue.push((childNode, directions + [direction], costs + cost), hCost)
 
 
-
-
 # --------------------------------------------------------------------- End of A Star
 
 
 def runSearch():
     mySnake = snake((255, 0, 0), START_POS)
-    # todo: Add functionality for randomly generated cubes that all search algorithms can use.
-
-    # commenting out the performActions() in each algorithm will let the searches run much faster with same results
-    # message_box("aStar", "Starting aStar Search...")
 
     goSlow = False
 
     for i in range(0, len(FOOD_POS)):
         dfs_search(mySnake, i, goSlow)
+        # if dfs_search(mySnake, i, goSlow):
+        #     break
     mySnake.reset(START_POS)
     for i in range(0, len(FOOD_POS)):
         bfs_search(mySnake, i, goSlow)
@@ -610,18 +617,33 @@ def runSearch():
         aStar_search(mySnake, i, goSlow)
     mySnake.reset(START_POS)
 
-    print("ACTIONS [ DFS,BFS,ASTAR]: ")
+    print("ACTIONS [ DFS, BFS, ASTAR ]: ")
     print(actionsList)
+    DFS_actions = sum(actionsList[0])
+    BFS_actions = sum(actionsList[1])
+    AStar_actions = sum(actionsList[2])
+    print("Total DFS actions taken:", DFS_actions)
+    print("Total BFS actions taken:", BFS_actions)
+    print("Total A_Star actions taken:", AStar_actions)
 
-    print("SCORES [ DFS,BFS,ASTAR]: ")
+    print("SCORES [ DFS, BFS, ASTAR ]: ")
     print(scoreList)
-
-    # todo: Scoring
-    """I'm thinking that we could do some sort of finalized score for each algorithm which would be some sort of
-    weighted average of body length + actions, as theoretically performance is technically determined by the length
-    of the body before it loses - some algorithms will fail before others. But it would also make sense to take
-    the number of actions they had to take into account."""
+    # todo: feel iffy about this scoring, need to make it so that actions is bad - dfs always wins because it has so many actions even though it always has lowest score
+    DFS_fScore = .8*scoreList[0] + .2*DFS_actions
+    BFS_fScore = .8*scoreList[1] + .2*BFS_actions
+    AStar_fScore = .8*scoreList[2] + .2*AStar_actions
+    print("Final DFS score:", DFS_fScore)
+    print("Final BFS score:", BFS_fScore)
+    print("Final A_Star score:", AStar_fScore)
 
 
 runSearch()
 # todo: rn current method is that if the stack is empty we add a cube instead of failing which may be a problem later
+# update: its a problem :(
+
+"""I made it so that snake class has a score member. This member only increases if we hit isGoalState. This fixes
+score, but number of actions is still inaccurate as the program continues to behave strangely when run into a corner
+(it technically continues iteration even when stopped so it makes weird values). Even if we can't fix that part we can
+still tell how its performing based off the majority of the data it makes + just using score."""
+
+"""Note: *sometimes it completely breaks with the snake's body being in the wrong place but ima ignore that"""
