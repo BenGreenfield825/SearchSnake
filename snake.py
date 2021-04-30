@@ -362,8 +362,6 @@ def main():
 
 # --------------------------------------------------------------------- End of running the game normally
 
-actionsList = [0, 0, 0]
-
 
 # --------------------------------------------------------------------- Feeding snake game hardcoded directions
 def feedDirections(s):
@@ -391,28 +389,35 @@ def feedDirections(s):
 # DEFINE CONSTANTS
 
 START_POS = (0, 0)
-# FOOD_POS = []
-# for j in range(0, 399): # 400 grid positions, i.e. max num of food positions can be 400
-#     foodX = random.randrange(19)
-#     foodY = random.randrange(19)
-#     food = foodX, foodY
-#     print(food)
-#     FOOD_POS[j] = food
-FOOD_POS = [(10, 0), (0, 10), (10, 0), (0, 10), (10, 0)]
+FOOD_POS = []
+for j in range(0, 399): # 400 grid positions, i.e. max num of food positions can be 400
+    foodX = random.randrange(19)
+    foodY = random.randrange(19)
+    food = foodX, foodY
+    print(food)
+    FOOD_POS.append(food)
+# FOOD_POS = [(10, 0), (0, 10), (10, 0), (0, 10), (10, 0)]
 # FOOD_POS = [(10, 0), (0, 10), (10, 10), (12, 10), (5, 5)] # did this for some other test values
+
+actionsList = [[], [], []]
+scoreList = [0,0,0]
+
 
 
 # --------------------------------------------------------------------- DFS
 
-
-def dfs_search(s, i):
+# s: snake object
+# i : iterator to keep track of where food will be
+# slow: True go slow False go fast
+def dfs_search(s, i, slow):
     from util import Stack
     global width, rows, snack, tempFood, startState, food
 
-    def performActions(dirs):
+    def performActions(dirs, slow):
         for action in dirs:
-            pygame.time.delay(50)
-            clock.tick(10)
+            if slow:
+                pygame.time.delay(50)
+                clock.tick(10)
             s.moveAuto(action)
             redrawWindow(win, s)
 
@@ -432,7 +437,6 @@ def dfs_search(s, i):
 
     while 1:
         if dfs_stack.isEmpty():
-            print("Failure")
             s.addCube()
             break
         current, directions = dfs_stack.pop()
@@ -440,16 +444,17 @@ def dfs_search(s, i):
         if current not in visited:
             visited.add(current)
             if s.isGoalState(current):
-                performActions(directions)
+                performActions(directions, slow)
                 print("DFS number of actions:", len(directions))
+                actionsList[0].append(len(directions))
                 print("DFS score:", len(s.body))
+                scoreList[0] = len(s.body)
             for childNode, direction, cost in s.getSuccessors(current):
                 if childNode not in dfs_stack.list:
                     if childNode in visited:
                         continue
                     dfs_stack.push((childNode, directions + [direction]))
 
-    actionsList[0] = len(directions)
 
 
 # --------------------------------------------------------------------- End DFS
@@ -457,14 +462,18 @@ def dfs_search(s, i):
 
 # --------------------------------------------------------------------- BFS
 
-def bfs_search(s, i):
+# s: snake object
+# i : iterator to keep track of where food will be
+# slow: True go slow False go fast
+def bfs_search(s, i, slow):
     from util import Queue
     global width, rows, snack, tempFood, startState, food
 
-    def performActions(dirs):
+    def performActions(dirs, slow):
         for action in dirs:
-            pygame.time.delay(50)
-            clock.tick(10)
+            if slow:
+                pygame.time.delay(50)
+                clock.tick(10)
             s.moveAuto(action)
             redrawWindow(win, s)
 
@@ -484,7 +493,6 @@ def bfs_search(s, i):
 
     while 1:
         if bfs_queue.isEmpty():
-            print("Failure")
             s.addCube()
             break
         current, directions = bfs_queue.pop()
@@ -492,16 +500,17 @@ def bfs_search(s, i):
         if current not in visited:
             visited.add(current)
             if s.isGoalState(current):
-                performActions(directions)
+                performActions(directions, slow)
                 print("BFS number of actions:", len(directions))
+                actionsList[1].append(len(directions))
                 print("BFS score:", len(s.body))
+                scoreList[1] = len(s.body)
             for childNode, direction, cost in s.getSuccessors(current):
                 if childNode not in bfs_queue.list:
                     if childNode in visited:
                         continue
                     bfs_queue.push((childNode, directions + [direction]))
 
-    actionsList[1] = len(directions)
 
 
 # --------------------------------------------------------------------- DFS
@@ -509,8 +518,10 @@ def bfs_search(s, i):
 
 # --------------------------------------------------------------------- A Star
 
-
-def aStar_search(s, i):
+# s: snake object
+# i : iterator to keep track of where food will be
+# slow: True go slow False go fast
+def aStar_search(s, i, slow):
     from util import Queue
     global width, rows, snack, tempFood, startState, food
 
@@ -525,11 +536,12 @@ def aStar_search(s, i):
         xy2 = food.pos
         return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
 
-    def performActions(dirs):
+    def performActions(dirs, slow):
         # perform actions in the game window so we can see the results
         for action in dirs:
-            pygame.time.delay(50)
-            clock.tick(10)
+            if slow:
+                pygame.time.delay(50)
+                clock.tick(10)
             s.moveAuto(action)
             redrawWindow(win, s)
 
@@ -561,9 +573,11 @@ def aStar_search(s, i):
         if current not in visited:
             visited.add(current)
             if s.isGoalState(current):
-                performActions(directions)
+                performActions(directions, slow)
                 print("A_Star number of actions:", len(directions))
+                actionsList[2].append(len(directions))
                 print("A_Star score:", len(s.body))
+                scoreList[2] = len(s.body)
             for childNode, direction, cost in s.getSuccessors(current):
                 if childNode not in aStar_priorityqueue.heap:
                     if childNode in visited:  # make sure child is not in visited so we don't go backwards
@@ -571,7 +585,7 @@ def aStar_search(s, i):
                     hCost = costs + cost + manhattanHeuristic(childNode)
                     aStar_priorityqueue.push((childNode, directions + [direction], costs + cost), hCost)
 
-    actionsList[2] = len(directions)
+
 
 
 # --------------------------------------------------------------------- End of A Star
@@ -583,15 +597,24 @@ def runSearch():
 
     # commenting out the performActions() in each algorithm will let the searches run much faster with same results
     # message_box("aStar", "Starting aStar Search...")
-    for i in range(0, 5):
-        aStar_search(mySnake, i)
+
+    goSlow = False
+
+    for i in range(0, len(FOOD_POS)):
+        dfs_search(mySnake, i, goSlow)
     mySnake.reset(START_POS)
-    for i in range(0, 5):
-        bfs_search(mySnake, i)
+    for i in range(0, len(FOOD_POS)):
+        bfs_search(mySnake, i, goSlow)
     mySnake.reset(START_POS)
-    for i in range(0, 5):
-        dfs_search(mySnake, i)
+    for i in range(0, len(FOOD_POS)):
+        aStar_search(mySnake, i, goSlow)
     mySnake.reset(START_POS)
+
+    print("ACTIONS [ DFS,BFS,ASTAR]: ")
+    print(actionsList)
+
+    print("SCORES [ DFS,BFS,ASTAR]: ")
+    print(scoreList)
 
     # todo: Scoring
     """I'm thinking that we could do some sort of finalized score for each algorithm which would be some sort of
