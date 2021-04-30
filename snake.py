@@ -216,6 +216,7 @@ class snake(object):
         and the two sides of the head (if we have not eaten food yet we can have 4 successors). We will also make it so
         that the snake can not wrap around the screen.'''
 
+        cost = 0
         wallPositions = []
         for x, wall in enumerate(self.walls):
             wallPositions.append(wall.pos)
@@ -237,9 +238,11 @@ class snake(object):
                         directionX = ""
                         if movesX == 1:
                             directionX = "RIGHT"
+                            cost = 1    # cost 1 prioritizes left and right actions
                         elif movesX == -1:
                             directionX = "LEFT"
-                        successors.append((nextState, directionX, 0))
+                            cost = 1
+                        successors.append((nextState, directionX, cost))
 
         # look at successors for y axis
         for moves in possible_moves:
@@ -254,9 +257,11 @@ class snake(object):
                         directionY = ""
                         if moves == 1:
                             directionY = "DOWN"
+                            cost = 2
                         elif moves == -1:
                             directionY = "UP"
-                        successors.append((nextState, directionY, 0))
+                            cost = 2
+                        successors.append((nextState, directionY, cost))
 
         # todo: toggle to see successors
         # print("Successors:", successors)
@@ -404,8 +409,8 @@ for j in range(0, 399):  # 400 grid positions, i.e. max num of food positions ca
     FOOD_POS.append(food)
 # FOOD_POS = [(10, 0), (0, 10), (10, 0), (0, 10), (10, 0)]
 
-actionsList = [[], [], []]
-scoreList = [0, 0, 0]
+actionsList = [[], [], [], []]
+scoreList = [0, 0, 0, 0]
 
 
 # --------------------------------------------------------------------- DFS
@@ -537,7 +542,7 @@ def aStar_search(s, i, slow):
     def manhattanHeuristic(position):
         # uses distance as a score for heuristic
         xy1 = position
-        xy2 = food.pos
+        xy2 = tempFood.pos
         return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
 
     def performActions(dirs, slow):
@@ -591,6 +596,62 @@ def aStar_search(s, i, slow):
 # --------------------------------------------------------------------- End of A Star
 
 
+# --------------------------------------------------------------------- UCS
+
+# s: snake object
+# i : iterator to keep track of where food will be
+# slow: True go slow False go fast
+def ucs_search(s, i, slow):
+    from util import Queue
+    global width, rows, snack, tempFood, startState, food
+
+    def performActions(dirs, slow):
+        # perform actions in the game window so we can see the results
+        for action in dirs:
+            if slow:
+                pygame.time.delay(50)
+                clock.tick(10)
+            s.moveAuto(action)
+            redrawWindow(win, s)
+
+    width = 500
+    rows = 20
+    win = pygame.display.set_mode((width, width))
+    startState = START_POS
+    snack = cube(FOOD_POS[i], color=(0, 255, 0))
+    tempFood = snack
+    clock = pygame.time.Clock()
+    flag = True
+
+    from util import PriorityQueue
+    ucs_priorityqueue = PriorityQueue()  # fringe
+    visited = set()
+    ucs_priorityqueue.push((s.getStartState(), [], 0), 0)
+
+    while 1:
+        if ucs_priorityqueue.isEmpty():
+            break
+
+        current, directions, costs = ucs_priorityqueue.pop()  # add costs for ucs
+        # print("Current:", current)
+        if current not in visited:
+            visited.add(current)
+            if s.isGoalState(current):
+                s.score += 1
+                s.addCube()
+                performActions(directions, slow)
+                # print("A_Star number of actions:", len(directions))
+                actionsList[3].append(len(directions))
+                # print("A_Star score:", len(s.body))
+                scoreList[3] = len(s.body)
+                # scoreList[2] = s.score
+            for childNode, direction, cost in s.getSuccessors(current):
+                if childNode not in ucs_priorityqueue.heap:
+                    if childNode in visited:  # make sure child is not in visited so we don't go backwards
+                        continue
+                    ucs_priorityqueue.push((childNode, directions + [direction], costs + cost), costs + cost)
+
+
 def runSearch():
     mySnake = snake((255, 0, 0), START_POS)
 
@@ -608,38 +669,48 @@ def runSearch():
     for i in range(0, len(FOOD_POS)):
         aStar_search(mySnake, i, goSlow)
     mySnake.reset(START_POS)
+    print("RUNNING UCS")
+    for i in range(0, len(FOOD_POS)):
+        ucs_search(mySnake, i, goSlow)
+    mySnake.reset(START_POS)
 
     # print("ACTIONS [ DFS, BFS, ASTAR ]: ")
     # print(actionsList)
     DFS_actions = sum(actionsList[0])
     BFS_actions = sum(actionsList[1])
     AStar_actions = sum(actionsList[2])
+    UCS_actions = sum(actionsList[3])
     print("Total DFS actions taken:", DFS_actions)
     print("Total BFS actions taken:", BFS_actions)
     print("Total A_Star actions taken:", AStar_actions)
+    print("Total UCS actions taken:", UCS_actions)
 
-    # print("SCORES [ DFS, BFS, ASTAR ]: ")
-    # print(scoreList)
-    calcScores = [0, 0, 0]
+    print("RAW SCORES [ DFS, BFS, ASTAR, UCS ]: ")
+    print(scoreList)
+    calcScores = [0, 0, 0, 0]
     calcScores[0] = (scoreList[0] / DFS_actions) * 100
     calcScores[1] = (scoreList[1] / BFS_actions) * 100
     calcScores[2] = (scoreList[2] / AStar_actions) * 100
+    calcScores[3] = (scoreList[3] / UCS_actions) * 100
     print("DFS score:", calcScores[0])
     print("BFS score:", calcScores[1])
     print("A_Star score:", calcScores[2])
+    print("UCS score:", calcScores[3])
 
     my_file = open(file, "w")
-    my_file.write('{0:10}  {1:14}\n'.format("BFS ACTIONS:", DFS_actions))
-    my_file.write('{0:10}  {1:14}\n'.format("DFS ACTIONS:", BFS_actions))
-    my_file.write('{0:10}  {1:14}\n'.format("ASTAR ACTIONS:", BFS_actions))
+    my_file.write('{0:10}  {1:14}\n'.format("BFS ACTIONS:", BFS_actions))
+    my_file.write('{0:10}  {1:14}\n'.format("DFS ACTIONS:", DFS_actions))
+    my_file.write('{0:10}  {1:14}\n'.format("ASTAR ACTIONS:", AStar_actions))
+    my_file.write('{0:10}  {1:14}\n'.format("UCS ACTIONS:", UCS_actions))
 
     my_file.write('{0:10}  {1:14}\n'.format("BFS SCORE:", calcScores[0]))
     my_file.write('{0:10}  {1:14}\n'.format("DFS SCORE:", calcScores[1]))
     my_file.write('{0:10}  {1:14}\n'.format("ASTAR SCORE:", calcScores[2]))
+    my_file.write('{0:10}  {1:14}\n'.format("UCS SCORE:", calcScores[3]))
     my_file.close()
 
     # Dictionary for graphing
-    data = {"Algorithm": ["DFS", "BFS", "ASTAR"],
+    data = {"Algorithm": ["DFS", "BFS", "ASTAR", "UCS"],
 
             "Score": calcScores
 
