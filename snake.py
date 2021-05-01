@@ -860,7 +860,6 @@ def runMultiple(times):
     averageCalcCosts[2] = sum(allCalcCosts[2])/times
     averageCalcCosts[3] = sum(allCalcCosts[3])/times
 
-
     # -------------------------------------------------------------- Bar Graph for Average Scores
     data = {"Algorithm": ["DFS", "BFS", "ASTAR", "UCS"],
 
@@ -879,6 +878,24 @@ def runMultiple(times):
     plot.show(block=True)
 
 
-runMultiple(5)
+def showExample():
+    foodPos()
+    mySnake = snake((255, 0, 0), START_POS)
+    goSlow = True
+    for i in range(0, 5):
+        bfs_search(mySnake, i, goSlow)
+    mySnake.reset(START_POS)
+    for i in range(0, 5):
+        aStar_search(mySnake, i, goSlow)
+    mySnake.reset(START_POS)
+    for i in range(0, 5):
+        ucs_search(mySnake, i, goSlow)
+    mySnake.reset(START_POS)
+    for i in range(0, 5):
+        dfs_search(mySnake, i, goSlow)
+    mySnake.reset(START_POS)
 
 
+# runMultiple(5)
+# main()
+showExample()
