@@ -409,16 +409,25 @@ def feedDirections(s):
 
 START_POS = (0, 0)
 FOOD_POS = []
-for j in range(0, 399):  # 400 grid positions, i.e. max num of food positions can be 400
-    foodX = random.randrange(19)
-    foodY = random.randrange(19)
-    food = foodX, foodY
-    # print(food)
-    FOOD_POS.append(food)
+def foodPos():
+    global FOOD_POS
+    FOOD_POS= []
+    for j in range(0, 399):  # 400 grid positions, i.e. max num of food positions can be 400
+        foodX = random.randrange(19)
+        foodY = random.randrange(19)
+        food = foodX, foodY
+        # print(food)
+        FOOD_POS.append(food)
 # FOOD_POS = [(10, 0), (0, 10), (10, 0), (0, 10), (10, 0)]
 
 actionsList = [[], [], [], []]
 scoreList = [0, 0, 0, 0]
+
+# all calculated score, maintain over multiple runs
+allCalcCosts = [[],[],[],[]]
+
+# all average score, calculated once
+averageCalcCosts = [[],[],[],[]]
 
 
 # --------------------------------------------------------------------- DFS
@@ -659,29 +668,35 @@ def ucs_search(s, i, slow):
                         continue
                     ucs_priorityqueue.push((childNode, directions + [direction], costs + cost), costs + cost)
 
+# run: run number of the routine
+def runSearch(run):
+    global actionsList
+    actionsList= [[],[],[],[]]
 
-def runSearch():
     mySnake = snake((255, 0, 0), START_POS)
 
     goSlow = False
 
-    print("RUNNING DFS")
+    # -------------------------------------------------------------- Run Search Algorithms
+    mySnake.reset(START_POS)
+    print("RUNNING DFS#", run)
     for i in range(0, len(FOOD_POS)):
         dfs_search(mySnake, i, goSlow)
     mySnake.reset(START_POS)
-    print("RUNNING BFS")
+    print("RUNNING BFS#", run)
     for i in range(0, len(FOOD_POS)):
         bfs_search(mySnake, i, goSlow)
     mySnake.reset(START_POS)
-    print("RUNNING ASTAR")
+    print("RUNNING ASTAR#", run)
     for i in range(0, len(FOOD_POS)):
         aStar_search(mySnake, i, goSlow)
     mySnake.reset(START_POS)
-    print("RUNNING UCS")
+    print("RUNNING UCS#", run)
     for i in range(0, len(FOOD_POS)):
         ucs_search(mySnake, i, goSlow)
     mySnake.reset(START_POS)
 
+    # -------------------------------------------------------------- Calculate new scores
     # print("ACTIONS [ DFS, BFS, ASTAR ]: ")
     # print(actionsList)
     DFS_actions = sum(actionsList[0])
@@ -705,7 +720,15 @@ def runSearch():
     print("A_Star score:", calcScores[2])
     print("UCS score:", calcScores[3])
 
-    my_file = open(file, "w")
+    allCalcCosts[0].append(calcScores[0])
+    allCalcCosts[1].append(calcScores[1])
+    allCalcCosts[2].append(calcScores[2])
+    allCalcCosts[3].append(calcScores[3])
+
+    # -------------------------------------------------------------- Write to file
+
+    my_file = open(file, "a")
+    my_file.write("RUN NUMBER: " + str(run) + " DATE:" + str(datetime.now()) + "\n")
     my_file.write('{0:10}  {1:14}\n'.format("BFS ACTIONS:", BFS_actions))
     my_file.write('{0:10}  {1:14}\n'.format("DFS ACTIONS:", DFS_actions))
     my_file.write('{0:10}  {1:14}\n'.format("ASTAR ACTIONS:", AStar_actions))
@@ -760,10 +783,10 @@ def runSearch():
 
     scoreIdx = [x for x in range(0,maxLen+1)]
 
-    print("DFS",actionsList[0])
-    print("BFS",actionsList[1])
-    print("ASTAR",actionsList[2])
-    print("UCS",actionsList[3])
+    # print("DFS",actionsList[0])
+    # print("BFS",actionsList[1])
+    # print("ASTAR",actionsList[2])
+    # print("UCS",actionsList[3])
 
 
     # -------------------------------------------------------------- DFS Line Graph for Actions
@@ -777,7 +800,7 @@ def runSearch():
     dataFrame = pd.DataFrame(data=data)
     # Draw a vertical bar chart
     dataFrame.plot(kind='line',x="Score", y="DFS", rot=70,
-                       title="Actions of Snake Game Search Algorithms " + str(datetime.now()))
+                       title="Actions of Snake Game Search Algorithms " + str(run) + " " + str(datetime.now()))
 
     plot.show(line=True)
     # -------------------------------------------------------------- BFS Line Graph for Actions
@@ -791,7 +814,7 @@ def runSearch():
     dataFrame = pd.DataFrame(data=data)
     # Draw a vertical bar chart
     dataFrame.plot(kind='line',x="Score", y="BFS", rot=70,
-                       title="Actions of Snake Game Search Algorithms " + str(datetime.now()))
+                       title="Actions of Snake Game Search Algorithms " + str(run) + " " + str(datetime.now()))
 
     plot.show(line=True)
 
@@ -806,7 +829,7 @@ def runSearch():
     dataFrame = pd.DataFrame(data=data)
     # Draw a vertical bar chart
     dataFrame.plot(kind='line',x="Score", y="ASTAR", rot=70,
-                       title="Actions of Snake Game Search Algorithms " + str(datetime.now()))
+                       title="Actions of Snake Game Search Algorithms " + str(run) + " " + str(datetime.now()))
 
     plot.show(line=True)
 
@@ -821,10 +844,41 @@ def runSearch():
     dataFrame = pd.DataFrame(data=data)
     # Draw a vertical bar chart
     dataFrame.plot(kind='line',x="Score", y="UCS", rot=70,
-                       title="Actions of Snake Game Search Algorithms " + str(datetime.now()))
+                       title="Actions of Snake Game Search Algorithms " + str(run) + " " +str(datetime.now()))
 
     plot.show(line=True)
 
+# times: number of times we are running searches and data
+def runMultiple(times):
 
-runSearch()
+    for x in range(0,times):
+        foodPos()
+        runSearch(x)
+
+    averageCalcCosts[0] = sum(allCalcCosts[0])/times
+    averageCalcCosts[1] = sum(allCalcCosts[1])/times
+    averageCalcCosts[2] = sum(allCalcCosts[2])/times
+    averageCalcCosts[3] = sum(allCalcCosts[3])/times
+
+
+    # -------------------------------------------------------------- Bar Graph for Average Scores
+    data = {"Algorithm": ["DFS", "BFS", "ASTAR", "UCS"],
+
+            "AvgScore": [round(x, 2) for x in averageCalcCosts]
+
+            }
+    # Dictionary loaded into a DataFrame
+    dataFrame = pd.DataFrame(data=data)
+    # Draw a vertical bar chart
+    ax = dataFrame.plot(kind='bar', x="Algorithm", y="AvgScore", rot=70,
+                            title="Scores of Snake Game Search Algorithms Avg " + str(datetime.now()))
+
+    for p in ax.patches:
+        ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
+
+    plot.show(block=True)
+
+
+runMultiple(5)
+
 
