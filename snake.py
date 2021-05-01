@@ -240,10 +240,10 @@ class snake(object):
                         directionX = ""
                         if movesX == 1:
                             directionX = "RIGHT"
-                            cost = 1    # cost 1 prioritizes left and right actions
+                            cost = (euclideanCost(current_pos, tempFood.pos) / 2) # prioritize left and right actions
                         elif movesX == -1:
                             directionX = "LEFT"
-                            cost = 1
+                            cost = (euclideanCost(current_pos, tempFood.pos) / 2)
                         successors.append((nextState, directionX, cost))
 
         # look at successors for y axis
@@ -259,15 +259,21 @@ class snake(object):
                         directionY = ""
                         if moves == 1:
                             directionY = "DOWN"
-                            cost = 2
+                            cost = euclideanCost(current_pos, tempFood.pos)
                         elif moves == -1:
                             directionY = "UP"
-                            cost = 2
+                            cost = euclideanCost(current_pos, tempFood.pos)
                         successors.append((nextState, directionY, cost))
 
         # todo: toggle to see successors
         # print("Successors:", successors)
         return successors
+
+
+def euclideanCost(position, goal): # use a euclidean measurement to use as a cost
+    xy1 = position
+    xy2 = goal
+    return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
 
 
 def drawGrid(w, rows, surface):

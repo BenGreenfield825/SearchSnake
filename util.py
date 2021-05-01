@@ -24,9 +24,6 @@ import sys
 import inspect
 import heapq, random
 
-"""yoinked this from pacman project"""
-
-
 
 """
  Data structures useful for implementing SearchAgents
