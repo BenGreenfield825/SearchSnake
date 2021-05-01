@@ -7,6 +7,7 @@
 
 import math
 import random
+
 import pygame
 import tkinter as tk
 from tkinter import messagebox
@@ -14,6 +15,7 @@ from tkinter import messagebox
 # Graphing
 import pandas as pd
 import matplotlib.pyplot as plot
+import numpy as np
 from datetime import datetime
 
 file = "results.txt"
@@ -708,33 +710,114 @@ def runSearch():
     my_file.write('{0:10}  {1:14}\n'.format("RAW ASTAR SCORE:", scoreList[2]))
     my_file.write('{0:10}  {1:14}\n\n'.format("RAW UCS SCORE:", scoreList[3]))
 
-    my_file.write('{0:10}  {1:14}\n'.format("BFS SCORE:", calcScores[0]))
-    my_file.write('{0:10}  {1:14}\n'.format("DFS SCORE:", calcScores[1]))
-    my_file.write('{0:10}  {1:14}\n'.format("ASTAR SCORE:", calcScores[2]))
-    my_file.write('{0:10}  {1:14}\n\n'.format("UCS SCORE:", calcScores[3]))
+    my_file.write('{0:10}  {1:14}\n'.format("CALC BFS SCORE:", calcScores[0]))
+    my_file.write('{0:10}  {1:14}\n'.format("CALC DFS SCORE:", calcScores[1]))
+    my_file.write('{0:10}  {1:14}\n'.format("CALC ASTAR SCORE:", calcScores[2]))
+    my_file.write('{0:10}  {1:14}\n\n'.format("CALC UCS SCORE:", calcScores[3]))
     my_file.close()
 
-    # Dictionary for graphing
+    # -------------------------------------------------------------- Bar Graph for Scores
     data = {"Algorithm": ["DFS", "BFS", "ASTAR", "UCS"],
 
-            "Score": calcScores
+            "Score": [round(x,2) for x in calcScores]
 
-            };
+            }
     # Dictionary loaded into a DataFrame
-    dataFrame = pd.DataFrame(data=data);
+    dataFrame = pd.DataFrame(data=data)
     # Draw a vertical bar chart
-    dataFrame.plot.bar(x="Algorithm", y="Score", rot=70,
-                       title="Scores of Snake Game Search Algorithms " + str(datetime.now()));
-    plot.show(block=True);
+    ax = dataFrame.plot(kind='bar',x="Algorithm", y="Score", rot=70,
+                       title="Scores of Snake Game Search Algorithms " + str(datetime.now()))
 
-    # example data table, lets do a dataframe created with actions table to analyze
-    # data = {'First Column Name': ['First value', 'Second value', ...],
-    #         'Second Column Name': ['First value', 'Second value', ...]
-    #         }
-    #
-    # df = pd.DataFrame(data, columns=['First Column Name', 'Second Column Name', ...])
-    #
-    # print(df)
+    for p in ax.patches:
+        ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
+
+    plot.show(block=True)
+
+    # -------------------------------------------------------------- Line Graph for Actions
+    print(len(actionsList[0]))
+    print(len(actionsList[1]))
+    print(len(actionsList[2]))
+    print(len(actionsList[3]))
+
+    maxLen = max(len(actionsList[0]),len(actionsList[1]),len(actionsList[2]),len(actionsList[3]))
+    # Using our actionsList lists we need to assign zeros where there are no slots
+    for x in range(0,maxLen):
+        if len(actionsList[0]) < maxLen+1:
+            actionsList[0].append(0)
+        if len(actionsList[1]) < maxLen+1:
+            actionsList[1].append(0)
+        if len(actionsList[2]) < maxLen+1:
+            actionsList[2].append(0)
+        if len(actionsList[3]) < maxLen+1:
+            actionsList[3].append(0)
+
+
+    scoreIdx = [x for x in range(0,maxLen+1)]
+
+    print("DFS",actionsList[0])
+    print("BFS",actionsList[1])
+    print("ASTAR",actionsList[2])
+    print("UCS",actionsList[3])
+
+
+    # -------------------------------------------------------------- DFS Line Graph for Actions
+
+    data = {"Score": scoreIdx,
+
+            "DFS": actionsList[0]
+
+            }
+    # Dictionary loaded into a DataFrame
+    dataFrame = pd.DataFrame(data=data)
+    # Draw a vertical bar chart
+    dataFrame.plot(kind='line',x="Score", y="DFS", rot=70,
+                       title="Actions of Snake Game Search Algorithms " + str(datetime.now()))
+
+    plot.show(line=True)
+    # -------------------------------------------------------------- BFS Line Graph for Actions
+
+    data = {"Score": scoreIdx,
+
+            "BFS": actionsList[1]
+
+            }
+    # Dictionary loaded into a DataFrame
+    dataFrame = pd.DataFrame(data=data)
+    # Draw a vertical bar chart
+    dataFrame.plot(kind='line',x="Score", y="BFS", rot=70,
+                       title="Actions of Snake Game Search Algorithms " + str(datetime.now()))
+
+    plot.show(line=True)
+
+    # -------------------------------------------------------------- ASTAR Line Graph for Actions
+
+    data = {"Score": scoreIdx,
+
+            "ASTAR": actionsList[2]
+
+            }
+    # Dictionary loaded into a DataFrame
+    dataFrame = pd.DataFrame(data=data)
+    # Draw a vertical bar chart
+    dataFrame.plot(kind='line',x="Score", y="ASTAR", rot=70,
+                       title="Actions of Snake Game Search Algorithms " + str(datetime.now()))
+
+    plot.show(line=True)
+
+    # -------------------------------------------------------------- UCS Line Graph for Actions
+
+    data = {"Score": scoreIdx,
+
+            "UCS": actionsList[3]
+
+            }
+    # Dictionary loaded into a DataFrame
+    dataFrame = pd.DataFrame(data=data)
+    # Draw a vertical bar chart
+    dataFrame.plot(kind='line',x="Score", y="UCS", rot=70,
+                       title="Actions of Snake Game Search Algorithms " + str(datetime.now()))
+
+    plot.show(line=True)
 
 
 runSearch()
