@@ -28,3 +28,22 @@ where score is the number of food eaten and actions is the sum of all actions ta
 to prioritize score over actions, as an algorithm that gets a higher score shows more success over
 basing it just on actions (i.e. DFS generates many actions, but a low score. DFS should be ranked lower
 even though it has a lot of actions).
+
+### How-to-use:
+After downloading from the git repository, you can:
+
+1. Run main()
+	-Can play game of snake 
+2. Run showExample()
+	-Runs all searches at a slow speed
+3. Run runMultiple(times) 
+	-Calls runSearch for x times
+	-Generates analytics based on every runSearch run
+4. runSearch(times)
+	-Runs every type of search for 400 iterations or until agent dies
+	-Calculates weighted scores
+	-Writes to results.txt file
+	-Generates a single bar graph with scores
+	-Generates 4 line plots with actions vs scores
+	
+
