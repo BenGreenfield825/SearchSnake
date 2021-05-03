@@ -19,9 +19,6 @@ https://www.youtube.com/watch?v=hrMI7ppUGyU&ab_channel=LazyTech*
  3. A Star Search
  4. Uniform Cost Search 
 
-### Methodology/Usage
-put words here mister
-
 ### Results:
 After testing and compiling data, we found that BFS performed the best overall. This was determined by using our
 scoring system which can represented by:
